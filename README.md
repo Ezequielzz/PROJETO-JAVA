@@ -217,3 +217,9 @@
   <div align="center">
     <img src="/img/Diagrama de Uso.png">
   </div>
+
+### Diagrama de Fluxo
+
+  <div align="center">
+    <img src="/img/Diagrama de Fluxo.png">
+  </div>
