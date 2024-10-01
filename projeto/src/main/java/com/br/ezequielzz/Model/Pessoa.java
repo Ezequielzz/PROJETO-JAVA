@@ -1,12 +1,15 @@
 package com.br.ezequielzz.Model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public abstract class Pessoa {
     private int id;
     private String nome;
@@ -14,12 +17,13 @@ public abstract class Pessoa {
     private Date dataNascimento;
     private String endereco;
     private String telefone;
+    private String senha;
 
     public abstract void atualizarDados();
 
-    public String formatarTelefone() {
-        // Implementação da formatação do telefone
-    }
+//    public String formatarTelefone() {
+//        // Implementação da formatação do telefone
+//    }
 
     public String toString() {
         return "Nome: " + nome + ", CPF: " + cpf + ", Data de Nascimento: " + dataNascimento + ", Endereço: " + endereco + ", Telefone: " + telefone;

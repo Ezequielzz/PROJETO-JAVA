@@ -56,7 +56,7 @@
      - Cálculo automático das médias bimestrais e finais, com base nos critérios definidos pela escola.
 
    - **Frequência**:
-     - Registro diário da frequência dos alunos, considerando presença, faltas justificadas e não justificadas.
+     - Registro diário da frequência dos alunos, considerando presença.
      - Relatórios de presença que ajudam a identificar alunos com problemas de assiduidade.
 
    - **Histórico Acadêmico**: Geração de um histórico acadêmico completo para cada aluno, listando suas notas, disciplinas cursadas e frequências ao longo dos anos.
@@ -107,6 +107,7 @@
     - `dataNascimento`: Date
     - `endereco`: String
     - `telefone`: String
+    - `senha`: String
 
   - **Métodos**
     - `atualizarDados()`
@@ -223,3 +224,75 @@
   <div align="center">
     <img src="/img/Diagrama de Fluxo.png">
   </div>
+
+### Schema Tabela
+
+CREATE TABLE Pessoa (
+id SERIAL PRIMARY KEY,
+nome VARCHAR(100) NOT NULL,
+cpf VARCHAR(11) UNIQUE NOT NULL,
+dataNascimento DATE NOT NULL,
+endereco VARCHAR(200),
+telefone VARCHAR(15)
+);
+
+ALTER TABLE Pessoa
+ADD COLUMN senha VARCHAR(255);
+
+CREATE TABLE Aluno (
+id SERIAL PRIMARY KEY,
+pessoa_id INT REFERENCES Pessoa(id) ON DELETE CASCADE,
+serie VARCHAR(50),
+turma_id INT REFERENCES Turma(id),
+statusMatricula VARCHAR(20) CHECK (statusMatricula IN ('ativo', 'transferido', 'desligado'))
+);
+
+CREATE TABLE Professor (
+id SERIAL PRIMARY KEY,
+pessoa_id INT REFERENCES Pessoa(id) ON DELETE CASCADE
+);
+
+CREATE TABLE Turma (
+id SERIAL PRIMARY KEY,
+serie VARCHAR(50),
+anoLetivo VARCHAR(9),
+turno VARCHAR(20) CHECK (turno IN ('matutino', 'vespertino', 'noturno')),
+sala VARCHAR(10)
+);
+
+CREATE TABLE Disciplina (
+id SERIAL PRIMARY KEY,
+nome VARCHAR(100) NOT NULL,
+turma_id INT REFERENCES Turma(id) ON DELETE CASCADE
+);
+
+CREATE TABLE Nota (
+id SERIAL PRIMARY KEY,
+aluno_id INT REFERENCES Aluno(id) ON DELETE CASCADE,
+disciplina_id INT REFERENCES Disciplina(id) ON DELETE CASCADE,
+valorNota NUMERIC(5,2),
+data DATE NOT NULL
+);
+
+CREATE TABLE Frequencia (
+id SERIAL PRIMARY KEY,
+aluno_id INT REFERENCES Aluno(id) ON DELETE CASCADE,
+disciplina_id INT REFERENCES Disciplina(id) ON DELETE CASCADE,
+data DATE NOT NULL,
+presenca BOOLEAN NOT NULL
+);
+
+CREATE TABLE Matricula (
+id SERIAL PRIMARY KEY,
+aluno_id INT REFERENCES Aluno(id) ON DELETE CASCADE,
+turma_id INT REFERENCES Turma(id) ON DELETE CASCADE,
+dataMatricula DATE NOT NULL,
+status VARCHAR(20) CHECK (status IN ('matriculado', 'cancelado', 'pendente'))
+);
+
+CREATE TABLE Relatorio (
+id SERIAL PRIMARY KEY,
+tipoRelatorio VARCHAR(50) CHECK (tipoRelatorio IN ('boletim', 'frequência', 'desempenho')),
+dataGeracao DATE NOT NULL,
+dadosRelatorio TEXT
+);
