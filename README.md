@@ -215,5 +215,5 @@
 ### Diagrama de Uso
 
   <div align="center">
-    <img src="/img/Diagrama%20de%20Uso.png">
+    <img src="/img/Diagrama de Uso.png">
   </div>
