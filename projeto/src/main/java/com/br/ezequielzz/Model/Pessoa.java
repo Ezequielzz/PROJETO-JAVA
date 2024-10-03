@@ -21,9 +21,18 @@ public abstract class Pessoa {
 
     public abstract void atualizarDados();
 
-//    public String formatarTelefone() {
-//        // Implementação da formatação do telefone
-//    }
+    public String formatarTelefone() {
+       if(telefone != null && telefone.length() == 10) {
+           return String.format("(%s) %s-%s", telefone.substring(0, 2), telefone.substring(2, 6), telefone.substring(6));
+       } else if (telefone != null && telefone.length() == 11) {
+           return String.format("(%s) %s-%s", telefone.substring(0, 2), telefone.substring(2, 7), telefone.substring(7));
+       }
+       return telefone;
+    }
+
+    public String formatarCpf() {
+        return cpf.replaceAll("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4");
+    }
 
     public String toString() {
         return "Nome: " + nome + ", CPF: " + cpf + ", Data de Nascimento: " + dataNascimento + ", Endereço: " + endereco + ", Telefone: " + telefone;

@@ -112,6 +112,7 @@
   - **Métodos**
     - `atualizarDados()`
     - `formatarTelefone()`
+    - `formatarCpf()`
     - `toString()`
 
 2. **Aluno**
