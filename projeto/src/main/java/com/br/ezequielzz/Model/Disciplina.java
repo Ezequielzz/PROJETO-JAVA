@@ -18,17 +18,4 @@ public class Disciplina {
         this.nome = nome;
         this.turmaId = turmaId;
     }
-
-    public float calcularMedia(List<Nota> notas) {
-        float soma = 0;
-        for (Nota nota : notas) {
-            soma += nota.getValorNota();
-        }
-        return notas.isEmpty() ? 0 : soma / notas.size();
-    }
-
-    public List<Nota> consultarNotas(Aluno aluno) {
-        DisciplinaDAO disciplinaDAO = new DisciplinaDAO();
-        return disciplinaDAO.consultarNotasAluno(this, aluno);
-    }
 }

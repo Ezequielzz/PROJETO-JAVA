@@ -41,7 +41,7 @@ public class TurmaDAO {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, turma.getTurmaId());
-            stmt.setInt(2, aluno.getAlunoId());
+            stmt.setInt(2, aluno.getId());
             stmt.executeUpdate();
 
         } catch (SQLException e) {
@@ -55,7 +55,7 @@ public class TurmaDAO {
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, aluno.getAlunoId());
+            stmt.setInt(1, aluno.getId());
             stmt.executeUpdate();
 
         } catch (SQLException e) {

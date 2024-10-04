@@ -10,6 +10,7 @@ import java.util.Date;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public abstract class Pessoa {
     private int id;
     private String nome;

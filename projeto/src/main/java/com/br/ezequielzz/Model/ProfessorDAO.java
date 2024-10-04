@@ -12,15 +12,21 @@ import java.sql.SQLException;
 public class ProfessorDAO {
 
     public void criarProfessor(Professor professor) {
-        String sql = "INSERT INTO Professor (pessoa_id) VALUES (?)";
+        String sql = "INSERT INTO Professor (nome, cpf, dataNascimento, endereco, telefone, senha) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            // Configura os parâmetros da query
-            stmt.setInt(1, professor.getId()); // `pessoa_id` vem da superclasse Pessoa
+            // Configurar os parâmetros para inserção na tabela Professor
+            stmt.setString(1, professor.getNome());
+            stmt.setString(2, professor.getCpf());
+            stmt.setDate(3, new java.sql.Date(professor.getDataNascimento().getTime())); // Conversão para java.sql.Date
+            stmt.setString(4, professor.getEndereco());
+            stmt.setString(5, professor.getTelefone());
+            stmt.setString(6, professor.getSenha());
 
-            // Executa a inserção no banco de dados
+            // Executar a inserção
             stmt.executeUpdate();
             System.out.println("Professor criado com sucesso!");
 

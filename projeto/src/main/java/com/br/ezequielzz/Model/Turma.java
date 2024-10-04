@@ -30,31 +30,4 @@ public class Turma {
         this.professores = new ArrayList<>();
         this.disciplinas = new ArrayList<>();
     }
-
-    public void adicionarAluno(Aluno aluno) {
-        if (aluno != null) {
-            TurmaDAO turmaDAO = new TurmaDAO();
-            turmaDAO.adicionarAlunoNaTurma(this, aluno);
-            alunos.add(aluno);
-        }
-    }
-
-    public void removerAluno(Aluno aluno) {
-        if (aluno != null) {
-            TurmaDAO turmaDAO = new TurmaDAO();
-            turmaDAO.removerAlunoDaTurma(this, aluno);
-            alunos.remove(aluno);
-        }
-    }
-
-    public void listarAlunos() {
-        for (Aluno aluno : alunos) {
-            System.out.println(aluno.toString());
-        }
-    }
-
-    public Turma buscarPorDisciplina(int disciplinaId) {
-        TurmaDAO turmaDAO = new TurmaDAO();
-        return turmaDAO.buscarPorDisciplina(disciplinaId);
-    }
 }

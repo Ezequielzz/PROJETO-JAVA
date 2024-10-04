@@ -41,7 +41,7 @@ public class DisciplinaDAO {
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, aluno.getAlunoId());
+            stmt.setInt(1, aluno.getId());
             stmt.setInt(2, disciplina.getId());
             ResultSet rs = stmt.executeQuery();
 

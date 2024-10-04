@@ -22,19 +22,4 @@ public class Matricula {
         this.dataMatricula = dataMatricula;
         this.status = status;
     }
-
-    // Método para realizar a matrícula de um aluno
-    public void realizarMatricula() {
-        MatriculaDAO matriculaDAO = new MatriculaDAO();
-        this.status = "matriculado"; // Define o status como matriculado
-        matriculaDAO.realizarMatricula(this);
-    }
-
-    // Método para cancelar a matrícula de um aluno
-    public void cancelarMatricula() {
-        MatriculaDAO matriculaDAO = new MatriculaDAO();
-        this.status = "cancelado"; // Define o status como cancelado
-        matriculaDAO.cancelarMatricula(this);
-    }
-
 }

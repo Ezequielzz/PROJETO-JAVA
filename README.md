@@ -228,29 +228,26 @@
 
 ### Schema Tabela
 
-CREATE TABLE Pessoa (
+CREATE TABLE Aluno (
 id SERIAL PRIMARY KEY,
 nome VARCHAR(100) NOT NULL,
 cpf VARCHAR(11) UNIQUE NOT NULL,
 dataNascimento DATE NOT NULL,
 endereco VARCHAR(200),
-telefone VARCHAR(15)
-);
-
-ALTER TABLE Pessoa
-ADD COLUMN senha VARCHAR(255);
-
-CREATE TABLE Aluno (
-id SERIAL PRIMARY KEY,
-pessoa_id INT REFERENCES Pessoa(id) ON DELETE CASCADE,
-serie VARCHAR(50),
+telefone VARCHAR(15),
+senha VARCHAR(255),
 turma_id INT REFERENCES Turma(id),
 statusMatricula VARCHAR(20) CHECK (statusMatricula IN ('ativo', 'transferido', 'desligado'))
 );
 
 CREATE TABLE Professor (
 id SERIAL PRIMARY KEY,
-pessoa_id INT REFERENCES Pessoa(id) ON DELETE CASCADE
+nome VARCHAR(100) NOT NULL,
+cpf VARCHAR(11) UNIQUE NOT NULL,
+dataNascimento DATE NOT NULL,
+endereco VARCHAR(200),
+telefone VARCHAR(15),
+senha VARCHAR(255)
 );
 
 CREATE TABLE Turma (
