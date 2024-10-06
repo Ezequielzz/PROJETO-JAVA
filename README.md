@@ -284,7 +284,7 @@ CREATE TABLE Matricula (
 id SERIAL PRIMARY KEY,
 aluno_id INT REFERENCES Aluno(id) ON DELETE CASCADE,
 turma_id INT REFERENCES Turma(id) ON DELETE CASCADE,
-dataMatricula DATE NOT NULL,
+data_matricula DATE NOT NULL,
 status VARCHAR(20) CHECK (status IN ('matriculado', 'cancelado', 'pendente'))
 );
 

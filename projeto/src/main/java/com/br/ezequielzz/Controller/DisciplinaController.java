@@ -28,4 +28,9 @@ public class DisciplinaController {
     public Disciplina buscarDisciplinaPorId(int id) {
         return disciplinaDAO.buscarDisciplinaPorId(id);
     }
+
+    // Buscar disciplinas por turma
+    public List<Disciplina> buscarDisciplinasPorTurma(int turmaId) {
+        return disciplinaDAO.buscarDisciplinasPorTurma(turmaId);
+    }
 }

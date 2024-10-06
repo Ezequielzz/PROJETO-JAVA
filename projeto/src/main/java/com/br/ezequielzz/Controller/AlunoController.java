@@ -26,9 +26,15 @@ public class AlunoController {
         return alunoDAO.listarTodos();
     }
 
+    // Listar alunos por turma
+    public List<Aluno> listarAlunosPorTurma(int turmaId) {
+        return alunoDAO.listarAlunosPorTurma(turmaId);
+    }
 
     public List<String> consultarHistorico(int alunoId) {
         // Chama o DAO para consultar o histórico no banco
         return alunoDAO.consultarHistorico(alunoId);
     }
+
+
 }

@@ -18,4 +18,9 @@ public class Disciplina {
         this.nome = nome;
         this.turmaId = turmaId;
     }
+
+    @Override
+    public String toString() {
+        return "Disciplina ID: " + id + " - Nome: " + nome;
+    }
 }

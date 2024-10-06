@@ -1,7 +1,5 @@
 package com.br.ezequielzz.Model;
 
-import com.br.ezequielzz.Model.Aluno;
-import com.br.ezequielzz.Model.Turma;
 import com.br.ezequielzz.Model.Database.ConnectionFactory;
 
 import java.sql.Connection;
@@ -16,7 +14,7 @@ public class AlunoDAO {
         String sql = "INSERT INTO aluno (nome, cpf, data_nascimento, endereco, telefone, senha, turma_id, status_matricula) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection connection = ConnectionFactory.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
+                PreparedStatement stmt = connection.prepareStatement(sql)) {
 
             stmt.setString(1, aluno.getNome());
             stmt.setString(2, aluno.getCpf());
@@ -34,13 +32,12 @@ public class AlunoDAO {
         }
     }
 
-
     public List<String> consultarHistorico(int alunoId) {
         List<String> historico = new ArrayList<>();
         String sql = "SELECT * FROM Historico WHERE aluno_id = ?";
 
         try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, alunoId);
             ResultSet rs = stmt.executeQuery();
@@ -63,8 +60,38 @@ public class AlunoDAO {
         String sql = "SELECT * FROM aluno"; // Ajuste para os campos corretos
 
         try (Connection connection = ConnectionFactory.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+                PreparedStatement stmt = connection.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Aluno aluno = new Aluno(
+                        rs.getInt("id"),
+                        rs.getString("nome"),
+                        rs.getString("cpf"),
+                        rs.getDate("data_nascimento"),
+                        rs.getString("endereco"),
+                        rs.getString("telefone"),
+                        rs.getString("senha"),
+                        rs.getInt("turma_id"),
+                        rs.getString("status_matricula"));
+                alunos.add(aluno);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return alunos;
+    }
+
+    public List<Aluno> listarAlunosPorTurma(int turmaId) {
+        List<Aluno> alunos = new ArrayList<>();
+        String sql = "SELECT * FROM Aluno WHERE turma_id = ?";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, turmaId);
+            ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
                 Aluno aluno = new Aluno(
@@ -77,6 +104,7 @@ public class AlunoDAO {
                         rs.getString("senha"),
                         rs.getInt("turma_id"),
                         rs.getString("status_matricula")
+
                 );
                 alunos.add(aluno);
             }

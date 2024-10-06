@@ -87,4 +87,31 @@ public class DisciplinaDAO {
 
         return disciplina;
     }
+
+    // Buscar disciplinas por turma
+    public List<Disciplina> buscarDisciplinasPorTurma(int turmaId) {
+        String sql = "SELECT * FROM Disciplina WHERE turma_id = ?";
+        List<Disciplina> disciplinas = new ArrayList<>();
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, turmaId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Disciplina disciplina = new Disciplina(
+                        rs.getInt("id"),
+                        rs.getString("nome"),
+                        rs.getInt("turma_id")
+                );
+                disciplinas.add(disciplina);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return disciplinas;
+    }
 }

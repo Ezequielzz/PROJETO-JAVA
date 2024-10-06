@@ -30,4 +30,9 @@ public class Turma {
         this.professores = new ArrayList<>();
         this.disciplinas = new ArrayList<>();
     }
+
+    @Override
+    public String toString() {
+        return "Turma ID: " + turmaId + " - Nome: " + serie;
+    }
 }
