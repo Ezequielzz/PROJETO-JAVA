@@ -104,7 +104,7 @@
     - `id`: Integer (PK)
     - `nome`: String
     - `cpf`: String
-    - `dataNascimento`: Date
+    - `data_nascimento`: Date
     - `endereco`: String
     - `telefone`: String
     - `senha`: String
@@ -115,19 +115,19 @@
     - `formatarCpf()`
     - `toString()`
 
-2. **Aluno**
+1. **Aluno**
   - **Atributos:**
     - `id`: Integer (PK, FK para Pessoa)
     - `serie`: String
     - `turma`: Turma (FK)
-    - `statusMatricula`: String (ativo, transferido, desligado)
+    - `status_matricula`: String (ativo, transferido, desligado)
 
   - **Métodos:**
     - `matricular()`
     - `atualizarDados()`@Override
     - `consultarHistorico()`
 
-3. **Professor**
+2. **Professor**
   - **Atributos:**
     - `id`: Integer (PK, FK para Pessoa)
     - `disciplinas`: List<Disciplina>
@@ -138,11 +138,11 @@
     - `lancarNota()`
     - `atualizarDados()`@Override
 
-4. **Turma**
+3. **Turma**
   - **Atributos:**
     - `id`: Integer (PK)
     - `serie`: String
-    - `anoLetivo`: String
+    - `ano_letivo`: String
     - `turno`: String
     - `sala`: String
     - `alunos`: List<Aluno>
@@ -154,7 +154,7 @@
     - `removerAluno()`
     - `listarAlunos()`
 
-5. **Disciplina**
+4. **Disciplina**
   - **Atributos:**
     - `id`: Integer (PK)
     - `nome`: String
@@ -166,19 +166,19 @@
     - `calcularMedia()`
     - `consultarNotas()`
 
-6. **Nota**
+5. **Nota**
   - **Atributos:**
     - `id`: Integer (PK)
     - `disciplina`: Disciplina (FK)
     - `aluno`: Aluno (FK)
-    - `valorNota`: Double
+    - `valor_nota`: Double
     - `data`: Date
 
   - **Métodos:**
     - `registrarNota()`
     - `atualizarNota()`
 
-7. **Frequência**
+6. **Frequência**
   - **Atributos:**
     - `id`: Integer (PK)
     - `aluno`: Aluno (FK)
@@ -190,24 +190,24 @@
     - `registrarPresenca()`
     - `consultarFrequencia()`
 
-8. **Relatório**
+7. **Relatório**
   - **Atributos:**
     - `id`: Integer (PK)
-    - `tipoRelatorio`: String (boletim, frequência, desempenho)
-    - `dataGeracao`: Date
-    - `dadosRelatorio`: String (contém os dados formatados)
+    - `tipo_relatorio`: String (boletim, frequência, desempenho)
+    - `data_geracao`: Date
+    - `dados_relatorio`: String (contém os dados formatados)
 
   - **Métodos:**
     - `gerarBoletim()`
     - `gerarRelatorioFrequencia()`
     - `gerarRelatorioDesempenho()`
 
-9. **Matrícula**
+8. **Matrícula**
   - **Atributos:**
     - `id`: Integer (PK)
     - `aluno`: Aluno (FK)
     - `turma`: Turma (FK)
-    - `dataMatricula`: Date
+    - `data_matricula`: Date
     - `status`: String (matriculado, cancelado)
 
   - **Métodos:**
@@ -232,19 +232,19 @@ CREATE TABLE Aluno (
 id SERIAL PRIMARY KEY,
 nome VARCHAR(100) NOT NULL,
 cpf VARCHAR(11) UNIQUE NOT NULL,
-dataNascimento DATE NOT NULL,
+data_nascimento DATE NOT NULL,
 endereco VARCHAR(200),
 telefone VARCHAR(15),
 senha VARCHAR(255),
 turma_id INT REFERENCES Turma(id),
-statusMatricula VARCHAR(20) CHECK (statusMatricula IN ('ativo', 'transferido', 'desligado'))
+status_matricula VARCHAR(20) CHECK (status_matricula IN ('ativo', 'transferido', 'desligado'))
 );
 
 CREATE TABLE Professor (
 id SERIAL PRIMARY KEY,
 nome VARCHAR(100) NOT NULL,
 cpf VARCHAR(11) UNIQUE NOT NULL,
-dataNascimento DATE NOT NULL,
+data_nascimento DATE NOT NULL,
 endereco VARCHAR(200),
 telefone VARCHAR(15),
 senha VARCHAR(255)
@@ -253,7 +253,7 @@ senha VARCHAR(255)
 CREATE TABLE Turma (
 id SERIAL PRIMARY KEY,
 serie VARCHAR(50),
-anoLetivo VARCHAR(9),
+ano_letivo VARCHAR(9),
 turno VARCHAR(20) CHECK (turno IN ('matutino', 'vespertino', 'noturno')),
 sala VARCHAR(10)
 );
@@ -268,7 +268,7 @@ CREATE TABLE Nota (
 id SERIAL PRIMARY KEY,
 aluno_id INT REFERENCES Aluno(id) ON DELETE CASCADE,
 disciplina_id INT REFERENCES Disciplina(id) ON DELETE CASCADE,
-valorNota NUMERIC(5,2),
+valor_nota NUMERIC(5,2),
 data DATE NOT NULL
 );
 
@@ -290,7 +290,7 @@ status VARCHAR(20) CHECK (status IN ('matriculado', 'cancelado', 'pendente'))
 
 CREATE TABLE Relatorio (
 id SERIAL PRIMARY KEY,
-tipoRelatorio VARCHAR(50) CHECK (tipoRelatorio IN ('boletim', 'frequência', 'desempenho')),
-dataGeracao DATE NOT NULL,
-dadosRelatorio TEXT
+tipo_relatorio VARCHAR(50) CHECK (tipo_relatorio IN ('boletim', 'frequência', 'desempenho')),
+data_geracao DATE NOT NULL,
+dados_relatorio TEXT
 );

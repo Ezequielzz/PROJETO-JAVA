@@ -13,7 +13,7 @@ import java.util.List;
 public class TurmaDAO {
 
     public void criarTurma(Turma turma) {
-        String sql = "INSERT INTO Turma (serie, anoLetivo, turno, sala) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Turma (serie, ano_letivo, turno, sala) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
@@ -75,7 +75,7 @@ public class TurmaDAO {
                 Turma turma = new Turma(
                         rs.getInt("id"),
                         rs.getString("serie"),
-                        rs.getString("anoLetivo"),
+                        rs.getString("ano_letivo"),
                         rs.getString("turno"),
                         rs.getString("sala")
                 );
@@ -103,7 +103,7 @@ public class TurmaDAO {
                 return new Turma(
                         rs.getInt("turma_id"),
                         rs.getString("serie"),
-                        rs.getString("anoLetivo"),
+                        rs.getString("ano_letivo"),
                         rs.getString("turno"),
                         rs.getString("sala")
                 );

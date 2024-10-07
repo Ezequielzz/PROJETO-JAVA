@@ -14,8 +14,18 @@ public class ProfessorController {
         this.professorDAO = new ProfessorDAO();
     }
 
-    public void criarAluno(Professor professor) {
-        professorDAO.criarProfessor(professor);
+    public boolean criarProfessor(Professor professor) {
+        try {
+            professorDAO.criarProfessor(professor);
+            return true;  // Sucesso
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;  // Falha
+        }
+    }
+
+    public List<Professor> listarTodosProfessores() {
+        return professorDAO.listarTodos();
     }
 
     // Método para atribuir uma disciplina ao Professor
@@ -29,11 +39,6 @@ public class ProfessorController {
             System.out.println("Disciplina já atribuída ao professor.");
         }
     }
-
-//    // Método para consultar as turmas do professor
-//    public List<Turma> consultarTurmas(Professor professor) {
-//        return professor.consultarTurmas();
-//    }
 
     // Método para lançar nota de um aluno em uma disciplina específica
     public void lancarNota(Professor professor, Aluno aluno, Disciplina disciplina, float valorNota) {

@@ -94,7 +94,7 @@ public class RelatorioDAO {
     // Método para gerar um boletim
     public String gerarBoletim(int alunoId) {
         String boletim = "";
-        String sql = "SELECT Disciplina.nome, Nota.valorNota " +
+        String sql = "SELECT Disciplina.nome, Nota.valor_nota " +
                 "FROM Nota " +
                 "JOIN Disciplina ON Nota.disciplina_id = Disciplina.id " +
                 "WHERE Nota.aluno_id = ?";
@@ -110,7 +110,7 @@ public class RelatorioDAO {
 
             while (rs.next()) {
                 sb.append("Disciplina: ").append(rs.getString("nome"))
-                        .append(" - Nota: ").append(rs.getDouble("valorNota"))
+                        .append(" - Nota: ").append(rs.getDouble("valor_nota"))
                         .append("\n");
             }
 
@@ -152,37 +152,5 @@ public class RelatorioDAO {
         }
 
         return frequencia;
-    }
-
-    // Método para gerar relatório de desempenho
-    public String gerarRelatorioDesempenho(int turmaId) {
-        String desempenho = "";
-        String sql = "SELECT Aluno.id, Aluno.nome, AVG(Nota.valorNota) as media " +
-                "FROM Nota " +
-                "JOIN Aluno ON Nota.aluno_id = Aluno.id " +
-                "WHERE Aluno.turma_id = ? " +
-                "GROUP BY Aluno.id, Aluno.nome";
-
-        try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, turmaId);
-            ResultSet rs = stmt.executeQuery();
-
-            StringBuilder sb = new StringBuilder();
-            sb.append("Relatório de Desempenho da Turma ID: ").append(turmaId).append("\n");
-
-            while (rs.next()) {
-                sb.append("Aluno: ").append(rs.getString("nome"))
-                        .append(" - Média: ").append(rs.getDouble("media"))
-                        .append("\n");
-            }
-
-            desempenho = sb.toString();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return desempenho;
     }
 }

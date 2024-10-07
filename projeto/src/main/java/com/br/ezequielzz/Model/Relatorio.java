@@ -31,10 +31,4 @@ public class Relatorio {
         RelatorioDAO relatorioDAO = new RelatorioDAO();
         return relatorioDAO.gerarRelatorioFrequencia(alunoId);
     }
-
-    // Método para gerar um relatório de desempenho
-    public String gerarRelatorioDesempenho(int turmaId) {
-        RelatorioDAO relatorioDAO = new RelatorioDAO();
-        return relatorioDAO.gerarRelatorioDesempenho(turmaId);
-    }
 }

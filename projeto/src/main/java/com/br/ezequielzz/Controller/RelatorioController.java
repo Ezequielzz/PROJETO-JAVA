@@ -1,10 +1,14 @@
 package com.br.ezequielzz.Controller;
 
+import com.br.ezequielzz.Model.Aluno;
 import com.br.ezequielzz.Model.Relatorio;
 import com.br.ezequielzz.Model.RelatorioDAO;
 
+import java.io.BufferedWriter;
 import java.util.Date;
 import java.util.List;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class RelatorioController {
 
@@ -14,28 +18,27 @@ public class RelatorioController {
         this.relatorioDAO = new RelatorioDAO();
     }
 
-    public void gerarRelatorio(String tipoRelatorio, Date dataGeracao, String dadosRelatorio) {
-        Relatorio relatorio = new Relatorio(0, tipoRelatorio, dataGeracao, dadosRelatorio);
-        relatorioDAO.gerarRelatorio(relatorio);
+    // Método para gerar arquivo de relatório em formato txt
+    public void gerarRelatorioBoletim(int alunoId, String caminhoArquivo) {
+        String boletim = relatorioDAO.gerarBoletim(alunoId);
+
+        try (FileWriter writer = new FileWriter(caminhoArquivo)) {
+            writer.write(boletim);
+            System.out.println("Boletim gerado no arquivo: " + caminhoArquivo);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public Relatorio buscarRelatorioPorId(int id) {
-        return relatorioDAO.buscarRelatorioPorId(id);
-    }
+    // Método para gerar arquivo de relatório de frequência em formato txt
+    public void gerarRelatorioFrequencia(int alunoId, String caminhoArquivo) {
+        String relatorioFrequencia = relatorioDAO.gerarRelatorioFrequencia(alunoId);
 
-    public List<Relatorio> listarRelatoriosPorTipo(String tipoRelatorio) {
-        return relatorioDAO.listarRelatoriosPorTipo(tipoRelatorio);
-    }
-
-    public String gerarBoletim(int alunoId) {
-        return relatorioDAO.gerarBoletim(alunoId);
-    }
-
-    public String gerarRelatorioFrequencia(int alunoId) {
-        return relatorioDAO.gerarRelatorioFrequencia(alunoId);
-    }
-
-    public String gerarRelatorioDesempenho(int turmaId) {
-        return relatorioDAO.gerarRelatorioDesempenho(turmaId);
+        try (FileWriter writer = new FileWriter(caminhoArquivo)) {
+            writer.write(relatorioFrequencia);
+            System.out.println("Relatório de frequência gerado no arquivo: " + caminhoArquivo);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

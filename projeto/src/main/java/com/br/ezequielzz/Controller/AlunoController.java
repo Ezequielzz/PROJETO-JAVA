@@ -22,7 +22,7 @@ public class AlunoController {
         }
     }
 
-    public java.util.List<Aluno> listarTodosAlunos() {
+    public List<Aluno> listarTodosAlunos() {
         return alunoDAO.listarTodos();
     }
 

@@ -1,14 +1,7 @@
 package com.br.ezequielzz.View;
 
-import com.br.ezequielzz.Controller.AlunoController;
-import com.br.ezequielzz.Controller.DisciplinaController;
-import com.br.ezequielzz.Controller.MatriculaController;
-import com.br.ezequielzz.Controller.NotaController;
-import com.br.ezequielzz.Controller.TurmaController;
-import com.br.ezequielzz.Model.Aluno;
-import com.br.ezequielzz.Model.Disciplina;
-import com.br.ezequielzz.Model.Matricula;
-import com.br.ezequielzz.Model.Turma;
+import com.br.ezequielzz.Controller.*;
+import com.br.ezequielzz.Model.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,16 +13,23 @@ import java.util.List;
 
 public class EscolaView extends JFrame {
     private AlunoController alunoController;
+    private ProfessorController professorController;
     private DisciplinaController disciplinaController;
     private NotaController notaController;
     private TurmaController turmaController;
+    private FrequenciaController frequenciaController;
+    private RelatorioController relatorioController;
     private Aluno aluno;
+    private Professor professor;
 
     public EscolaView() {
         alunoController = new AlunoController();
         disciplinaController = new DisciplinaController();
         notaController = new NotaController();
         turmaController = new TurmaController();
+        frequenciaController = new FrequenciaController();
+        relatorioController = new RelatorioController();
+        professorController = new ProfessorController();
 
         // Configurações básicas do JFrame
         setTitle("Sistema de Gestão Escolar");
@@ -39,6 +39,14 @@ public class EscolaView extends JFrame {
 
         // Criação do JTabbedPane
         JTabbedPane tabbedPane = new JTabbedPane();
+
+        // Painel para listar professores
+        JPanel listarProfessoresPanel = criarListarProfessoresPanel();
+        tabbedPane.addTab("Listar Professores", listarProfessoresPanel);
+
+        // Painel para alunos
+        JPanel professorPanel = criarProfessorPanel();
+        tabbedPane.addTab("Professor", professorPanel);
 
         // Painel para listar alunos
         JPanel listarAlunosPanel = criarListarAlunosPanel();
@@ -51,17 +59,24 @@ public class EscolaView extends JFrame {
         JPanel matriculaPanel = criarMatriculaPanel();
         tabbedPane.addTab("Matrículas", matriculaPanel);
 
-        // Painel para disciplinas
-        JPanel disciplinaPanel = criarDisciplinaPanel();
-        tabbedPane.addTab("Disciplinas", disciplinaPanel);
-
         // Painel para notas
         JPanel notaPanel = criarPainelAtribuirNota();
         tabbedPane.addTab("Notas", notaPanel);
 
+        // Painel para frequencia
+        JPanel frequenciaPanel = criarPainelRegistrarFrequencia();
+        tabbedPane.addTab("Frequência", frequenciaPanel);
+
+        JPanel disciplinaPanel = criarPainelCriarDisciplina();
+        tabbedPane.addTab("Disciplinas", disciplinaPanel);
+
         // Painel para turmas
-        JPanel turmaPanel = criarTurmaPanel();
+        JPanel turmaPanel = criarPainelCriarTurma();
         tabbedPane.addTab("Turmas", turmaPanel);
+
+        // Painel para relatorios
+        JPanel relatorioPanel = criarPainelGerarRelatorio();
+        tabbedPane.addTab("Relatorio", relatorioPanel);
 
         // Adicionar o tabbedPane ao JFrame
         add(tabbedPane, BorderLayout.CENTER);
@@ -70,13 +85,128 @@ public class EscolaView extends JFrame {
         setVisible(true);
     }
 
+    private JPanel criarProfessorPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(10, 2)); // Ajuste para incluir todos os campos necessários
+
+        // Campos necessários para criar um professor
+        JLabel nomeLabel = new JLabel("Nome:");
+        JTextField nomeField = new JTextField();
+
+        JLabel cpfLabel = new JLabel("CPF:");
+        JTextField cpfField = new JTextField();
+
+        JLabel dataNascimentoLabel = new JLabel("Data de Nascimento (dd/MM/yyyy):");
+        JTextField dataNascimentoField = new JTextField();
+
+        JLabel enderecoLabel = new JLabel("Endereço:");
+        JTextField enderecoField = new JTextField();
+
+        JLabel telefoneLabel = new JLabel("Telefone:");
+        JTextField telefoneField = new JTextField();
+
+        JLabel senhaLabel = new JLabel("Senha:");
+        JTextField senhaField = new JTextField();
+
+        JButton criarProfessorButton = new JButton("Criar Professor");
+
+        criarProfessorButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    // Capturar os valores dos campos
+                    String nome = nomeField.getText().trim();
+                    String cpf = cpfField.getText().trim();
+                    String endereco = enderecoField.getText().trim();
+                    String telefone = telefoneField.getText().trim();
+                    String senha = senhaField.getText().trim();
+
+                    // Convertendo a data de nascimento
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                    Date dataNascimento = formatter.parse(dataNascimentoField.getText().trim());
+
+                    // Criar objeto Aluno com todos os parâmetros necessários
+                    professor = new Professor(0, nome, cpf, dataNascimento, endereco, telefone, senha);
+
+                    // Chamar o controlador para criar o aluno
+                    boolean sucesso = professorController.criarProfessor(professor);
+
+                    if (sucesso) {
+                        JOptionPane.showMessageDialog(null, "Professor criado com sucesso!");
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Erro ao criar professor.");
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, "Erro ao criar professor: " + ex.getMessage());
+                }
+            }
+        });
+
+        // Adicionar os campos ao painel
+        panel.add(nomeLabel);
+        panel.add(nomeField);
+
+        panel.add(cpfLabel);
+        panel.add(cpfField);
+
+        panel.add(dataNascimentoLabel);
+        panel.add(dataNascimentoField);
+
+        panel.add(enderecoLabel);
+        panel.add(enderecoField);
+
+        panel.add(telefoneLabel);
+        panel.add(telefoneField);
+
+        panel.add(senhaLabel);
+        panel.add(senhaField);
+
+        panel.add(new JLabel()); // Espaçamento
+        panel.add(criarProfessorButton);
+
+        return panel;
+    }
+
+    private JPanel criarListarProfessoresPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+
+        // Definir os nomes das colunas
+        String[] colunas = {"ID", "Nome", "CPF", "Data de Nascimento", "Endereço", "Telefone"};
+
+        // Obter os dados dos alunos
+        List<Professor> professores = professorController.listarTodosProfessores();
+        Object[][] dados = new Object[professores.size()][6];
+
+        // Preencher a tabela com os dados dos professores
+        for (int i = 0; i < professores.size(); i++) {
+            Professor professor = professores.get(i);
+            dados[i][0] = professor.getId();
+            dados[i][1] = professor.getNome();
+            dados[i][2] = professor.getCpf();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            dados[i][3] = sdf.format(professor.getDataNascimento());
+            dados[i][4] = professor.getEndereco();
+            dados[i][5] = professor.getTelefone();
+        }
+
+        // Criar a tabela
+        JTable tabelProfessores = new JTable(dados, colunas);
+
+        // Adicionar a tabela a um JScrollPane para permitir a rolagem
+        JScrollPane scrollPane = new JScrollPane(tabelProfessores);
+        panel.add(scrollPane, BorderLayout.CENTER);
+
+        return panel;
+    }
+
     private JPanel criarListarAlunosPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
         // Definir os nomes das colunas
-        String[] colunas = { "ID", "Nome", "CPF", "Data de Nascimento", "Endereço", "Telefone", "Turma",
-                " Situação Matrícula" };
+        String[] colunas = {"ID", "Nome", "CPF", "Data de Nascimento", "Endereço", "Telefone", "Turma",
+                " Situação Matrícula"};
 
         // Obter os dados dos alunos
         java.util.List<Aluno> alunos = alunoController.listarTodosAlunos();
@@ -245,7 +375,7 @@ public class EscolaView extends JFrame {
 
         // Label e JComboBox para status da matrícula
         JLabel statusLabel = new JLabel("Status:");
-        JComboBox<String> statusComboBox = new JComboBox<>(new String[] { "matriculado", "cancelado", "pendente" });
+        JComboBox<String> statusComboBox = new JComboBox<>(new String[]{"matriculado", "cancelado", "pendente"});
 
         // Botão para efetuar a matrícula
         JButton matricularButton = new JButton("Realizar Matrícula");
@@ -310,33 +440,6 @@ public class EscolaView extends JFrame {
         }
     }
 
-    // Método para criar painel de Disciplina
-    private JPanel criarDisciplinaPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(5, 2));
-
-        JLabel nomeLabel = new JLabel("Nome da Disciplina:");
-        JTextField nomeField = new JTextField();
-        JButton criarDisciplinaButton = new JButton("Criar Disciplina");
-
-        criarDisciplinaButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String nomeDisciplina = nomeField.getText();
-                Disciplina disciplina = new Disciplina(0, nomeDisciplina, 0); // Simplificado
-                disciplinaController.criarDisciplina(disciplina);
-                JOptionPane.showMessageDialog(null, "Disciplina criada com sucesso!");
-            }
-        });
-
-        panel.add(nomeLabel);
-        panel.add(nomeField);
-        panel.add(new JLabel()); // Espaçamento
-        panel.add(criarDisciplinaButton);
-
-        return panel;
-    }
-
     public JPanel criarPainelAtribuirNota() {
         JPanel painel = new JPanel();
         painel.setLayout(new BoxLayout(painel, BoxLayout.Y_AXIS));
@@ -355,7 +458,7 @@ public class EscolaView extends JFrame {
 
         // Label para exibir Disciplina
         JLabel labelDisciplina = new JLabel("Disciplina:");
-        JComboBox<Disciplina> comboBoxDisciplina = new JComboBox<>(); 
+        JComboBox<Disciplina> comboBoxDisciplina = new JComboBox<>();
         painel.add(labelDisciplina);
         painel.add(comboBoxDisciplina);
 
@@ -417,36 +520,224 @@ public class EscolaView extends JFrame {
         return painel;
     }
 
-    // Método para criar painel de Turma
-    private JPanel criarTurmaPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(5, 2));
+    public JPanel criarPainelRegistrarFrequencia() {
+        JPanel painel = new JPanel();
+        painel.setLayout(new BoxLayout(painel, BoxLayout.Y_AXIS));
 
-        JLabel serieLabel = new JLabel("Série:");
-        JTextField serieField = new JTextField();
-        JLabel anoLetivoLabel = new JLabel("Ano Letivo:");
-        JTextField anoLetivoField = new JTextField();
-        JButton criarTurmaButton = new JButton("Criar Turma");
+        // Label e JComboBox para selecionar Turma
+        JLabel labelTurma = new JLabel("Selecione a Turma:");
+        JComboBox<Turma> comboBoxTurma = new JComboBox<>();
+        painel.add(labelTurma);
+        painel.add(comboBoxTurma);
 
-        criarTurmaButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String serie = serieField.getText();
-                String anoLetivo = anoLetivoField.getText();
+        // Label e JComboBox para selecionar Aluno
+        JLabel labelAluno = new JLabel("Selecione o Aluno:");
+        JComboBox<Aluno> comboBoxAluno = new JComboBox<>();
+        painel.add(labelAluno);
+        painel.add(comboBoxAluno);
 
-                Turma turma = new Turma(0, serie, anoLetivo, "", "");
+        // Label para exibir Disciplina
+        JLabel labelDisciplina = new JLabel("Disciplina:");
+        JComboBox<Disciplina> comboBoxDisciplina = new JComboBox<>();
+        painel.add(labelDisciplina);
+        painel.add(comboBoxDisciplina);
+
+        // Label e JComboBox para selecionar presença
+        JLabel labelPresenca = new JLabel("Presença:");
+        JComboBox<String> comboBoxPresenca = new JComboBox<>(new String[]{"Presente", "Ausente"});
+        painel.add(labelPresenca);
+        painel.add(comboBoxPresenca);
+
+        // Botão para registrar a presença
+        JButton botaoRegistrarFrequencia = new JButton("Registrar Frequência");
+        painel.add(botaoRegistrarFrequencia);
+
+        // Preenchendo JComboBox de turmas com as turmas do BD
+        List<Turma> turmas = turmaController.listarTodasTurmas();
+        for (Turma turma : turmas) {
+            comboBoxTurma.addItem(turma);
+        }
+
+        // Listener para atualizar alunos e disciplinas ao selecionar uma turma
+        comboBoxTurma.addActionListener(e -> {
+            Turma turmaSelecionada = (Turma) comboBoxTurma.getSelectedItem();
+            if (turmaSelecionada != null) {
+                // Atualizar lista de alunos
+                comboBoxAluno.removeAllItems();
+                List<Aluno> alunos = alunoController.listarAlunosPorTurma(turmaSelecionada.getTurmaId());
+                for (Aluno aluno : alunos) {
+                    comboBoxAluno.addItem(aluno);
+                }
+
+                // Atualizar lista de disciplinas
+                comboBoxDisciplina.removeAllItems();
+                List<Disciplina> disciplinas = disciplinaController.buscarDisciplinasPorTurma(turmaSelecionada.getTurmaId());
+                for (Disciplina disciplina : disciplinas) {
+                    comboBoxDisciplina.addItem(disciplina);
+                }
+            }
+        });
+
+        // Ação do botão para registrar frequência
+        botaoRegistrarFrequencia.addActionListener(e -> {
+            Aluno alunoSelecionado = (Aluno) comboBoxAluno.getSelectedItem();
+            Disciplina disciplinaSelecionada = (Disciplina) comboBoxDisciplina.getSelectedItem();
+            String presenca = (String) comboBoxPresenca.getSelectedItem();
+
+            if (alunoSelecionado != null && disciplinaSelecionada != null && presenca != null) {
+                boolean estaPresente = presenca.equals("Presente");
+                Date data = new Date(); // Data atual
+                Frequencia frequencia = new Frequencia(0, alunoSelecionado.getId(), disciplinaSelecionada.getId(), data, estaPresente); // Usando boolean aqui
+                frequenciaController.registrarFrequencia(frequencia);
+                JOptionPane.showMessageDialog(null, "Frequência registrada com sucesso!");
+            } else {
+                JOptionPane.showMessageDialog(null, "Por favor, selecione todas as opções.");
+            }
+        });
+
+
+        return painel;
+    }
+
+    public JPanel criarPainelCriarDisciplina() {
+        JPanel painel = new JPanel();
+        painel.setLayout(new BoxLayout(painel, BoxLayout.Y_AXIS));
+
+        // Label e campo de texto para nome da disciplina
+        JLabel labelNome = new JLabel("Nome da Disciplina:");
+        JTextField campoNome = new JTextField(20);
+        painel.add(labelNome);
+        painel.add(campoNome);
+
+        // Label e JComboBox para selecionar a turma
+        JLabel labelTurma = new JLabel("Selecione a Turma:");
+        JComboBox<Turma> comboBoxTurma = new JComboBox<>();
+        painel.add(labelTurma);
+        painel.add(comboBoxTurma);
+
+        // Botão para criar disciplina
+        JButton botaoCriarDisciplina = new JButton("Criar Disciplina");
+        painel.add(botaoCriarDisciplina);
+
+        // Preenchendo JComboBox com as turmas do banco de dados
+        List<Turma> turmas = turmaController.listarTodasTurmas();
+        for (Turma turma : turmas) {
+            comboBoxTurma.addItem(turma);
+        }
+
+        // Ação do botão para criar a disciplina
+        botaoCriarDisciplina.addActionListener(e -> {
+            String nomeDisciplina = campoNome.getText();
+            Turma turmaSelecionada = (Turma) comboBoxTurma.getSelectedItem();
+
+            if (nomeDisciplina.isEmpty() || turmaSelecionada == null) {
+                JOptionPane.showMessageDialog(null, "Por favor, preencha todos os campos.");
+            } else {
+                Disciplina disciplina = new Disciplina(0, nomeDisciplina, turmaSelecionada.getTurmaId());
+                disciplinaController.criarDisciplina(disciplina);
+                JOptionPane.showMessageDialog(null, "Disciplina criada com sucesso!");
+            }
+        });
+
+        return painel;
+    }
+
+
+    public JPanel criarPainelCriarTurma() {
+        JPanel painel = new JPanel();
+        painel.setLayout(new BoxLayout(painel, BoxLayout.Y_AXIS));
+
+        // Label e campo de texto para série
+        JLabel labelSerie = new JLabel("Série:");
+        JTextField campoSerie = new JTextField(20);
+        painel.add(labelSerie);
+        painel.add(campoSerie);
+
+        // Label e campo de texto para ano letivo
+        JLabel labelAnoLetivo = new JLabel("Ano Letivo:");
+        JTextField campoAnoLetivo = new JTextField(20);
+        painel.add(labelAnoLetivo);
+        painel.add(campoAnoLetivo);
+
+        // Label e campo de texto para turno
+        JLabel labelTurno = new JLabel("Turno:");
+        JTextField campoTurno = new JTextField(20);
+        painel.add(labelTurno);
+        painel.add(campoTurno);
+
+        // Label e campo de texto para sala
+        JLabel labelSala = new JLabel("Sala:");
+        JTextField campoSala = new JTextField(20);
+        painel.add(labelSala);
+        painel.add(campoSala);
+
+        // Botão para criar turma
+        JButton botaoCriarTurma = new JButton("Criar Turma");
+        painel.add(botaoCriarTurma);
+
+        // Ação do botão para criar a turma
+        botaoCriarTurma.addActionListener(e -> {
+            String serie = campoSerie.getText();
+            String anoLetivo = campoAnoLetivo.getText();
+            String turno = campoTurno.getText();
+            String sala = campoSala.getText();
+
+            if (serie.isEmpty() || anoLetivo.isEmpty() || turno.isEmpty() || sala.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Por favor, preencha todos os campos.");
+            } else {
+                Turma turma = new Turma(0, serie, anoLetivo, turno, sala);
                 turmaController.criarTurma(turma);
                 JOptionPane.showMessageDialog(null, "Turma criada com sucesso!");
             }
         });
 
-        panel.add(serieLabel);
-        panel.add(serieField);
-        panel.add(anoLetivoLabel);
-        panel.add(anoLetivoField);
-        panel.add(new JLabel()); // Espaçamento
-        panel.add(criarTurmaButton);
-
-        return panel;
+        return painel;
     }
+
+    public JPanel criarPainelGerarRelatorio() {
+        JPanel painel = new JPanel();
+        painel.setLayout(new BoxLayout(painel, BoxLayout.Y_AXIS));
+
+        // Label e JComboBox para selecionar Aluno
+        JLabel labelAluno = new JLabel("Selecione o Aluno:");
+        JComboBox<Aluno> comboBoxAluno = new JComboBox<>();
+        painel.add(labelAluno);
+        painel.add(comboBoxAluno);
+
+        // Botões para gerar diferentes tipos de relatório
+        JButton botaoGerarBoletim = new JButton("Gerar Boletim");
+        JButton botaoGerarFrequencia = new JButton("Gerar Relatório de Frequência");
+        painel.add(botaoGerarBoletim);
+        painel.add(botaoGerarFrequencia);
+
+        // Preenchendo JComboBox com os alunos
+        List<Aluno> alunos = alunoController.listarTodosAlunos();
+        for (Aluno aluno : alunos) {
+            comboBoxAluno.addItem(aluno);
+        }
+
+        // Ação do botão para gerar boletim
+        botaoGerarBoletim.addActionListener(e -> {
+            Aluno alunoSelecionado = (Aluno) comboBoxAluno.getSelectedItem();
+            if (alunoSelecionado != null) {
+                String caminhoArquivo = "C:\\Users\\DevTarde\\Documents\\Ezequielzz\\PROJETO-JAVA\\boletim_aluno" + alunoSelecionado.getId() + ".txt"; // Defina o caminho
+                relatorioController.gerarRelatorioBoletim(alunoSelecionado.getId(), caminhoArquivo);
+            } else {
+                JOptionPane.showMessageDialog(null, "Por favor, selecione um aluno.");
+            }
+        });
+
+        //  Ação do botão para gerar relatório de frequência
+        botaoGerarFrequencia.addActionListener(e -> {
+            Aluno alunoSelecionado = (Aluno) comboBoxAluno.getSelectedItem();
+            if (alunoSelecionado != null) {
+                String caminhoArquivo = "C:\\Users\\DevTarde\\Documents\\Ezequielzz\\PROJETO-JAVA\\frequencia_aluno" + alunoSelecionado.getId() + ".txt"; // Defina o caminho
+                relatorioController.gerarRelatorioFrequencia(alunoSelecionado.getId(), caminhoArquivo);
+            } else {
+                JOptionPane.showMessageDialog(null, "Por favor, selecione um aluno.");
+            }
+        });
+        return painel;
+    }
+
 }

@@ -55,7 +55,7 @@ public class AlunoDAO {
         return historico;
     }
 
-    public java.util.List<Aluno> listarTodos() {
+    public List<Aluno> listarTodos() {
         List<Aluno> alunos = new ArrayList<>();
         String sql = "SELECT * FROM aluno"; // Ajuste para os campos corretos
 

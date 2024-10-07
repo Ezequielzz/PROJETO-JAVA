@@ -8,11 +8,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProfessorDAO {
 
     public void criarProfessor(Professor professor) {
-        String sql = "INSERT INTO Professor (nome, cpf, dataNascimento, endereco, telefone, senha) " +
+        String sql = "INSERT INTO Professor (nome, cpf, data_nascimento, endereco, telefone, senha) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = ConnectionFactory.getConnection();
@@ -33,6 +35,32 @@ public class ProfessorDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public List<Professor> listarTodos() {
+        List<Professor> professores = new ArrayList<>();
+        String sql = "SELECT * FROM professor"; // Ajuste para os campos corretos
+
+        try (Connection connection = ConnectionFactory.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Professor professor = new Professor(
+                        rs.getInt("id"),
+                        rs.getString("nome"),
+                        rs.getString("cpf"),
+                        rs.getDate("data_nascimento"),
+                        rs.getString("endereco"),
+                        rs.getString("telefone"),
+                        rs.getString("senha"));
+                professores.add(professor);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return professores;
     }
 
     public void atribuirDisciplina(Professor professor, Disciplina disciplina) {
