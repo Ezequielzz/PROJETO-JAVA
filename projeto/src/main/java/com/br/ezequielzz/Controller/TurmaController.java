@@ -1,5 +1,7 @@
 package com.br.ezequielzz.Controller;
 
+import java.sql.SQLException;
+
 import com.br.ezequielzz.Model.Turma;
 import com.br.ezequielzz.Model.TurmaDAO;
 import com.br.ezequielzz.Model.Aluno;
@@ -36,5 +38,9 @@ public class TurmaController {
     // Buscar uma turma por disciplina
     public Turma buscarPorDisciplina(int disciplinaId) {
         return turmaDAO.buscarPorDisciplina(disciplinaId);
+    }
+
+    public void excluirTurma(int turmaId) throws SQLException {
+        turmaDAO.excluirTurma(turmaId);
     }
 }

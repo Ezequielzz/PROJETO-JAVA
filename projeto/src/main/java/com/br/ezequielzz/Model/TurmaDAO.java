@@ -199,4 +199,22 @@ public class TurmaDAO {
         }
         return null;
     }
+
+    public void excluirTurma(int turmaId) throws SQLException {
+        String sql = "DELETE FROM turma WHERE id = ?";
+
+        try (Connection connection = ConnectionFactory.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setInt(1, turmaId);
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("Nenhum turma encontrado com o ID fornecido.");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException("Erro ao excluir turma", e);
+        }
+    }
 }

@@ -40,4 +40,8 @@ public class AlunoController {
         alunoDAO.atualizarAluno(aluno);
     }
 
+    public Aluno buscarAlunoPorId(int id) throws SQLException {
+        return alunoDAO.buscarAlunoPorId(id);
+    }
+    
 }

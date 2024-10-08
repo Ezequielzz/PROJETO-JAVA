@@ -56,4 +56,12 @@ public class ProfessorController {
         professorDAO.excluirProfessor(professorId);
     }
 
+    public void atualizarProfessor(Professor professor) throws SQLException {
+        professorDAO.atualizarProfessor(professor);
+    }
+
+    public Professor buscarProfessorPorId(int id) throws SQLException {
+        return professorDAO.buscarProfessorPorId(id);
+    }
+
 }

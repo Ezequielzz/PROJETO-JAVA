@@ -137,5 +137,35 @@ public class AlunoDAO {
         }
     }
 
+    public Aluno buscarAlunoPorId(int id) throws SQLException {
+        String sql = "SELECT * FROM aluno WHERE id = ?";
+        Aluno aluno = null;
+    
+        try (Connection connection = ConnectionFactory.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+    
+            if (rs.next()) {
+                aluno = new Aluno();
+                aluno.setId(rs.getInt("id"));
+                aluno.setNome(rs.getString("nome"));
+                aluno.setCpf(rs.getString("cpf"));
+                aluno.setDataNascimento(rs.getDate("data_nascimento"));
+                aluno.setEndereco(rs.getString("endereco"));
+                aluno.setTelefone(rs.getString("telefone"));
+                aluno.setSenha(rs.getString("senha"));
+                aluno.setTurmaId(rs.getInt("turma_id"));
+                aluno.setStatusMatricula(rs.getString("status_matricula"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException("Erro ao buscar aluno por ID", e);
+        }
+    
+        return aluno;
+    }
+    
 
 }

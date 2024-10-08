@@ -1,11 +1,7 @@
 package com.br.ezequielzz.View;
 
-import com.br.ezequielzz.Controller.*;
-import com.br.ezequielzz.Model.*;
-
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
@@ -13,7 +9,38 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+
+import com.br.ezequielzz.Controller.AlunoController;
+import com.br.ezequielzz.Controller.DisciplinaController;
+import com.br.ezequielzz.Controller.FrequenciaController;
+import com.br.ezequielzz.Controller.MatriculaController;
+import com.br.ezequielzz.Controller.NotaController;
+import com.br.ezequielzz.Controller.ProfessorController;
+import com.br.ezequielzz.Controller.RelatorioController;
+import com.br.ezequielzz.Controller.TurmaController;
+import com.br.ezequielzz.Model.Aluno;
+import com.br.ezequielzz.Model.Disciplina;
+import com.br.ezequielzz.Model.Frequencia;
+import com.br.ezequielzz.Model.Matricula;
+import com.br.ezequielzz.Model.Professor;
+import com.br.ezequielzz.Model.Turma;
+
 public class EscolaView extends JFrame {
+    private JTable tabelaAlunos;
+    private JTable tabelaProfessores;
     private AlunoController alunoController;
     private ProfessorController professorController;
     private DisciplinaController disciplinaController;
@@ -174,30 +201,16 @@ public class EscolaView extends JFrame {
         panel.setLayout(new BorderLayout());
 
         // Definir os nomes das colunas
-        String[] colunas = {"ID", "Nome", "CPF", "Data de Nascimento", "Endereço", "Telefone"};
+        String[] colunas = { "ID", "Nome", "CPF", "Data de Nascimento", "Endereço", "Telefone" };
 
-        // Obter os dados dos alunos
-        List<Professor> professores = professorController.listarTodosProfessores();
-        Object[][] dados = new Object[professores.size()][6];
-
-        // Preencher a tabela com os dados dos professores
-        for (int i = 0; i < professores.size(); i++) {
-            Professor professor = professores.get(i);
-            dados[i][0] = professor.getId();
-            dados[i][1] = professor.getNome();
-            dados[i][2] = professor.getCpf();
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-            dados[i][3] = sdf.format(professor.getDataNascimento());
-            dados[i][4] = professor.getEndereco();
-            dados[i][5] = professor.getTelefone();
-        }
-
-        // Criar a tabela
-        JTable tabelProfessores = new JTable(dados, colunas);
-
-        // Adicionar a tabela a um JScrollPane para permitir a rolagem
-        JScrollPane scrollPane = new JScrollPane(tabelProfessores);
+        // Criar um DefaultTableModel inicialmente com dados vazios
+        DefaultTableModel modeloTabela = new DefaultTableModel(new Object[0][6], colunas);
+        tabelaProfessores = new JTable(modeloTabela); // Agora usando DefaultTableModel
+        JScrollPane scrollPane = new JScrollPane(tabelaProfessores);
         panel.add(scrollPane, BorderLayout.CENTER);
+
+        // Inicializar a tabela com os dados
+        atualizarTabelaProfessores();
 
         // Criar painel para os botões
         JPanel botaoPanel = new JPanel();
@@ -205,13 +218,13 @@ public class EscolaView extends JFrame {
         // Botão de Excluir
         JButton btnExcluir = new JButton("Excluir");
         btnExcluir.addActionListener(e -> {
-            int linhaSelecionada = tabelProfessores.getSelectedRow();
+            int linhaSelecionada = tabelaProfessores.getSelectedRow();
             if (linhaSelecionada != -1) {
-                int professorId = (int) dados[linhaSelecionada][0]; // ID do aluno
+                int professorId = (int) tabelaProfessores.getValueAt(linhaSelecionada, 0); // ID do professor
                 try {
                     professorController.excluirProfessor(professorId);
                     JOptionPane.showMessageDialog(panel, "Professor excluído com sucesso!");
-                    atualizarTabela(tabelProfessores); // Atualiza a tabela após exclusão
+                    atualizarTabelaProfessores(); // Atualizar a tabela após exclusão
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(panel, "Erro ao excluir professor: " + ex.getMessage());
                 }
@@ -220,10 +233,104 @@ public class EscolaView extends JFrame {
             }
         });
 
+        // Botão de Atualizar
+        JButton btnAtualizar = new JButton("Atualizar");
+        btnAtualizar.addActionListener(e -> {
+            int linhaSelecionada = tabelaProfessores.getSelectedRow();
+            if (linhaSelecionada != -1) {
+                int professorId = (int) tabelaProfessores.getValueAt(linhaSelecionada, 0); // ID do professor
+                try {
+                    Professor professor = professorController.buscarProfessorPorId(professorId);
+                    if (professor != null) {
+                        editarProfessorDialog(professor);
+                    } else {
+                        JOptionPane.showMessageDialog(panel, "Professor não encontrado.");
+                    }
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(panel, "Erro ao buscar professor: " + ex.getMessage());
+                }
+            } else {
+                JOptionPane.showMessageDialog(panel, "Selecione um professor para atualizar.");
+            }
+        });
+
+        botaoPanel.add(btnAtualizar);
         botaoPanel.add(btnExcluir);
         panel.add(botaoPanel, BorderLayout.NORTH);
 
         return panel;
+    }
+
+    // Método para atualizar a tabela de professores
+    private void atualizarTabelaProfessores() {
+        List<Professor> professores = professorController.listarTodosProfessores();
+        Object[][] dadosAtualizados = new Object[professores.size()][6]; // 6 colunas
+
+        for (int i = 0; i < professores.size(); i++) {
+            Professor professor = professores.get(i);
+            dadosAtualizados[i][0] = professor.getId();
+            dadosAtualizados[i][1] = professor.getNome();
+            dadosAtualizados[i][2] = professor.getCpf();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            dadosAtualizados[i][3] = sdf.format(professor.getDataNascimento());
+            dadosAtualizados[i][4] = professor.getEndereco();
+            dadosAtualizados[i][5] = professor.getTelefone();
+        }
+
+        // Atualizar os dados na tabela
+        DefaultTableModel model = (DefaultTableModel) tabelaProfessores.getModel();
+        model.setDataVector(dadosAtualizados,
+                new String[] { "ID", "Nome", "CPF", "Data de Nascimento", "Endereço", "Telefone" });
+    }
+
+    // Diálogo de edição de professor
+    private void editarProfessorDialog(Professor professor) {
+        // Criar um diálogo para editar os dados
+        JDialog dialog = new JDialog();
+        dialog.setTitle("Editar Professor");
+        dialog.setSize(400, 300);
+        dialog.setLayout(new GridLayout(0, 2));
+
+        // Campos de texto para editar os dados do professor
+        JTextField nomeField = new JTextField(professor.getNome());
+        JTextField cpfField = new JTextField(professor.getCpf());
+        JTextField enderecoField = new JTextField(professor.getEndereco());
+        JTextField telefoneField = new JTextField(professor.getTelefone());
+
+        // Adicionar os campos ao diálogo
+        dialog.add(new JLabel("Nome:"));
+        dialog.add(nomeField);
+        dialog.add(new JLabel("CPF:"));
+        dialog.add(cpfField);
+        dialog.add(new JLabel("Endereço:"));
+        dialog.add(enderecoField);
+        dialog.add(new JLabel("Telefone:"));
+        dialog.add(telefoneField);
+
+        // Botão de salvar as alterações
+        JButton salvarBtn = new JButton("Salvar");
+        salvarBtn.addActionListener(e -> {
+            // Atualizar os dados do professor com os valores do formulário
+            professor.setNome(nomeField.getText());
+            professor.setCpf(cpfField.getText());
+            professor.setEndereco(enderecoField.getText());
+            professor.setTelefone(telefoneField.getText());
+
+            // Chamar o método de atualização no controller
+            try {
+                professorController.atualizarProfessor(professor);
+                JOptionPane.showMessageDialog(dialog, "Professor atualizado com sucesso!");
+                dialog.dispose();
+                atualizarTabelaProfessores(); // Atualizar a tabela após a edição
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(dialog, "Erro ao atualizar professor: " + ex.getMessage());
+            }
+        });
+
+        dialog.add(new JLabel()); // Espaçamento
+        dialog.add(salvarBtn);
+
+        dialog.setVisible(true);
     }
 
     private JPanel criarListarAlunosPanel() {
@@ -231,33 +338,17 @@ public class EscolaView extends JFrame {
         panel.setLayout(new BorderLayout());
 
         // Definir os nomes das colunas
-        String[] colunas = {"ID", "Nome", "CPF", "Data de Nascimento", "Endereço", "Telefone", "Turma", "Situação Matrícula"};
+        String[] colunas = { "ID", "Nome", "CPF", "Data de Nascimento", "Endereço", "Telefone", "Turma",
+                "Situação Matrícula" };
 
-        // Obter os dados dos alunos
-        java.util.List<Aluno> alunos = alunoController.listarTodosAlunos();
-        Object[][] dados = new Object[alunos.size()][8];
-
-        // Preencher a tabela com os dados dos alunos
-        for (int i = 0; i < alunos.size(); i++) {
-            Aluno aluno = alunos.get(i);
-            dados[i][0] = aluno.getId();
-            dados[i][1] = aluno.getNome();
-            dados[i][2] = aluno.getCpf();
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-            dados[i][3] = sdf.format(aluno.getDataNascimento());
-            dados[i][4] = aluno.getEndereco();
-            dados[i][5] = aluno.getTelefone();
-            dados[i][6] = aluno.getTurmaId();
-            dados[i][7] = aluno.getStatusMatricula();
-        }
-
-        // Criar a tabela
-        JTable tabelaAlunos = new JTable(dados, colunas);
-        tabelaAlunos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // Permitir seleção de uma linha
-
-        // Adicionar a tabela a um JScrollPane para permitir a rolagem
+        // Criar um DefaultTableModel inicialmente com dados vazios
+        DefaultTableModel modeloTabela = new DefaultTableModel(new Object[0][8], colunas);
+        tabelaAlunos = new JTable(modeloTabela); // Agora usando DefaultTableModel
         JScrollPane scrollPane = new JScrollPane(tabelaAlunos);
         panel.add(scrollPane, BorderLayout.CENTER);
+
+        // Inicializar a tabela com os dados
+        atualizarTabelaAlunos();
 
         // Criar painel para os botões
         JPanel botaoPanel = new JPanel();
@@ -267,11 +358,11 @@ public class EscolaView extends JFrame {
         btnExcluir.addActionListener(e -> {
             int linhaSelecionada = tabelaAlunos.getSelectedRow();
             if (linhaSelecionada != -1) {
-                int alunoId = (int) dados[linhaSelecionada][0]; // ID do aluno
+                int alunoId = (int) tabelaAlunos.getValueAt(linhaSelecionada, 0); // ID do aluno
                 try {
                     alunoController.excluirAluno(alunoId);
                     JOptionPane.showMessageDialog(panel, "Aluno excluído com sucesso!");
-                    atualizarTabela(tabelaAlunos); // Atualiza a tabela após exclusão
+                    atualizarTabelaAlunos(); // Atualizar a tabela após exclusão
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(panel, "Erro ao excluir aluno: " + ex.getMessage());
                 }
@@ -280,24 +371,114 @@ public class EscolaView extends JFrame {
             }
         });
 
+        // Botão de Atualizar
+        JButton btnAtualizar = new JButton("Atualizar");
+        btnAtualizar.addActionListener(e -> {
+            int linhaSelecionada = tabelaAlunos.getSelectedRow();
+            if (linhaSelecionada != -1) {
+                // Obter o ID do aluno selecionado
+                int alunoId = (int) tabelaAlunos.getValueAt(linhaSelecionada, 0);
+                try {
+                    // Buscar os dados completos do aluno
+                    Aluno aluno = alunoController.buscarAlunoPorId(alunoId);
+                    // Abrir um diálogo para edição
+                    if (aluno != null) {
+                        editarAlunoDialog(aluno);
+                    } else {
+                        JOptionPane.showMessageDialog(panel, "Aluno não encontrado.");
+                    }
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(panel, "Erro ao buscar aluno: " + ex.getMessage());
+                }
+            } else {
+                JOptionPane.showMessageDialog(panel, "Selecione um aluno para atualizar.");
+            }
+        });
+
+        botaoPanel.add(btnAtualizar);
         botaoPanel.add(btnExcluir);
         panel.add(botaoPanel, BorderLayout.NORTH);
 
         return panel;
     }
 
+    // Método para atualizar a tabela de alunos
+    private void atualizarTabelaAlunos() {
+        List<Aluno> alunos = alunoController.listarTodosAlunos();
+        Object[][] dadosAtualizados = new Object[alunos.size()][8]; // 8 colunas
 
-
-    private void atualizarTabela() {
-        tableModel.setRowCount(0);
-        contatos = new ContatoDAO().listarTodos();
-
-        for (Contato contato : contatos) {
-            tableModel.addRow(new Object[] { aluno.getNome(), aluno.getCpf(), aluno.getTelefone(), aluno.getDataNascimento(), aluno.getEndereco(), aluno.getEndereco());
+        for (int i = 0; i < alunos.size(); i++) {
+            Aluno aluno = alunos.get(i);
+            dadosAtualizados[i][0] = aluno.getId();
+            dadosAtualizados[i][1] = aluno.getNome();
+            dadosAtualizados[i][2] = aluno.getCpf();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            dadosAtualizados[i][3] = sdf.format(aluno.getDataNascimento());
+            dadosAtualizados[i][4] = aluno.getEndereco();
+            dadosAtualizados[i][5] = aluno.getTelefone();
+            dadosAtualizados[i][6] = aluno.getTurmaId();
+            dadosAtualizados[i][7] = aluno.getStatusMatricula();
         }
+
+        // Atualizar os dados na tabela
+        DefaultTableModel model = (DefaultTableModel) tabelaAlunos.getModel();
+        model.setDataVector(dadosAtualizados, new String[] { "ID", "Nome", "CPF", "Data de Nascimento", "Endereço",
+                "Telefone", "Turma", "Situação Matrícula" });
     }
 
+    // Diálogo de edição de aluno
+    private void editarAlunoDialog(Aluno aluno) {
+        // Criar um diálogo para editar os dados
+        JDialog dialog = new JDialog();
+        dialog.setTitle("Editar Aluno");
+        dialog.setSize(400, 300);
+        dialog.setLayout(new GridLayout(0, 2));
 
+        // Campos de texto para editar os dados do aluno
+        JTextField nomeField = new JTextField(aluno.getNome());
+        JTextField cpfField = new JTextField(aluno.getCpf());
+        JTextField enderecoField = new JTextField(aluno.getEndereco());
+        JTextField telefoneField = new JTextField(aluno.getTelefone());
+        JTextField senhaField = new JTextField(aluno.getSenha());
+
+        // Adicionar os campos ao diálogo
+        dialog.add(new JLabel("Nome:"));
+        dialog.add(nomeField);
+        dialog.add(new JLabel("CPF:"));
+        dialog.add(cpfField);
+        dialog.add(new JLabel("Endereço:"));
+        dialog.add(enderecoField);
+        dialog.add(new JLabel("Telefone:"));
+        dialog.add(telefoneField);
+        dialog.add(new JLabel("Senha:"));
+        dialog.add(senhaField);
+
+        // Botão de salvar as alterações
+        JButton salvarBtn = new JButton("Salvar");
+        salvarBtn.addActionListener(e -> {
+            // Atualizar os dados do aluno com os valores do formulário
+            aluno.setNome(nomeField.getText());
+            aluno.setCpf(cpfField.getText());
+            aluno.setEndereco(enderecoField.getText());
+            aluno.setTelefone(telefoneField.getText());
+            aluno.setSenha(senhaField.getText());
+
+            // Chamar o método de atualização no controller
+            try {
+                alunoController.atualizarAluno(aluno);
+                JOptionPane.showMessageDialog(dialog, "Aluno atualizado com sucesso!");
+                dialog.dispose();
+                atualizarTabelaAlunos(); // Atualizar a tabela após a edição
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(dialog, "Erro ao atualizar aluno: " + ex.getMessage());
+            }
+        });
+
+        dialog.add(new JLabel()); // Espaçamento
+        dialog.add(salvarBtn);
+
+        dialog.setVisible(true);
+    }
 
     private JPanel criarAlunoPanel() {
         JPanel panel = new JPanel();
@@ -438,7 +619,7 @@ public class EscolaView extends JFrame {
 
         // Label e JComboBox para status da matrícula
         JLabel statusLabel = new JLabel("Status:");
-        JComboBox<String> statusComboBox = new JComboBox<>(new String[]{"matriculado", "cancelado", "pendente"});
+        JComboBox<String> statusComboBox = new JComboBox<>(new String[] { "matriculado", "cancelado", "pendente" });
 
         // Botão para efetuar a matrícula
         JButton matricularButton = new JButton("Realizar Matrícula");
@@ -553,7 +734,8 @@ public class EscolaView extends JFrame {
                 }
                 // Atualiza a lista de disciplinas da turma
                 comboBoxDisciplina.removeAllItems();
-                List<Disciplina> disciplinas = disciplinaController.buscarDisciplinasPorTurma(turmaSelecionada.getTurmaId());
+                List<Disciplina> disciplinas = disciplinaController
+                        .buscarDisciplinasPorTurma(turmaSelecionada.getTurmaId());
                 for (Disciplina disciplina : disciplinas) {
                     comboBoxDisciplina.addItem(disciplina);
                 }
@@ -570,7 +752,8 @@ public class EscolaView extends JFrame {
                 try {
                     float nota = Float.parseFloat(campoNota.getText());
                     // Registrar nota no banco de dados
-                    notaController.registrarNota(alunoSelecionado.getId(), disciplinaSelecionada.getId(), nota, new Date());
+                    notaController.registrarNota(alunoSelecionado.getId(), disciplinaSelecionada.getId(), nota,
+                            new Date());
                     JOptionPane.showMessageDialog(null, "Nota lançada com sucesso!");
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(null, "Informe uma nota válida.");
@@ -607,7 +790,7 @@ public class EscolaView extends JFrame {
 
         // Label e JComboBox para selecionar presença
         JLabel labelPresenca = new JLabel("Presença:");
-        JComboBox<String> comboBoxPresenca = new JComboBox<>(new String[]{"Presente", "Ausente"});
+        JComboBox<String> comboBoxPresenca = new JComboBox<>(new String[] { "Presente", "Ausente" });
         painel.add(labelPresenca);
         painel.add(comboBoxPresenca);
 
@@ -634,7 +817,8 @@ public class EscolaView extends JFrame {
 
                 // Atualizar lista de disciplinas
                 comboBoxDisciplina.removeAllItems();
-                List<Disciplina> disciplinas = disciplinaController.buscarDisciplinasPorTurma(turmaSelecionada.getTurmaId());
+                List<Disciplina> disciplinas = disciplinaController
+                        .buscarDisciplinasPorTurma(turmaSelecionada.getTurmaId());
                 for (Disciplina disciplina : disciplinas) {
                     comboBoxDisciplina.addItem(disciplina);
                 }
@@ -650,14 +834,14 @@ public class EscolaView extends JFrame {
             if (alunoSelecionado != null && disciplinaSelecionada != null && presenca != null) {
                 boolean estaPresente = presenca.equals("Presente");
                 Date data = new Date(); // Data atual
-                Frequencia frequencia = new Frequencia(0, alunoSelecionado.getId(), disciplinaSelecionada.getId(), data, estaPresente); // Usando boolean aqui
+                Frequencia frequencia = new Frequencia(0, alunoSelecionado.getId(), disciplinaSelecionada.getId(), data,
+                        estaPresente); // Usando boolean aqui
                 frequenciaController.registrarFrequencia(frequencia);
                 JOptionPane.showMessageDialog(null, "Frequência registrada com sucesso!");
             } else {
                 JOptionPane.showMessageDialog(null, "Por favor, selecione todas as opções.");
             }
         });
-
 
         return painel;
     }
@@ -709,7 +893,8 @@ public class EscolaView extends JFrame {
             if (nomeDisciplina.isEmpty() || turmaSelecionada == null) {
                 JOptionPane.showMessageDialog(null, "Por favor, preencha todos os campos.");
             } else {
-                Disciplina disciplina = new Disciplina(0, nomeDisciplina, turmaSelecionada.getTurmaId(), professorSelecionado.getProfessorId());
+                Disciplina disciplina = new Disciplina(0, nomeDisciplina, turmaSelecionada.getTurmaId(),
+                        professorSelecionado.getProfessorId());
                 disciplinaController.criarDisciplina(disciplina);
                 JOptionPane.showMessageDialog(null, "Disciplina criada com sucesso!");
             }
@@ -717,7 +902,6 @@ public class EscolaView extends JFrame {
 
         return painel;
     }
-
 
     public JPanel criarPainelCriarTurma() {
         JPanel painel = new JPanel();
@@ -796,18 +980,20 @@ public class EscolaView extends JFrame {
         botaoGerarBoletim.addActionListener(e -> {
             Aluno alunoSelecionado = (Aluno) comboBoxAluno.getSelectedItem();
             if (alunoSelecionado != null) {
-                String caminhoArquivo = "C:\\Users\\DevTarde\\Documents\\Ezequielzz\\PROJETO-JAVA\\boletim_aluno" + alunoSelecionado.getId() + ".txt"; // Defina o caminho
+                String caminhoArquivo = "F:\\Samuel SENAI\\Projeto-JAVA\\boletim_aluno"
+                        + alunoSelecionado.getId() + ".txt"; // Defina o caminho
                 relatorioController.gerarRelatorioBoletim(alunoSelecionado.getId(), caminhoArquivo);
             } else {
                 JOptionPane.showMessageDialog(null, "Por favor, selecione um aluno.");
             }
         });
 
-        //  Ação do botão para gerar relatório de frequência
+        // Ação do botão para gerar relatório de frequência
         botaoGerarFrequencia.addActionListener(e -> {
             Aluno alunoSelecionado = (Aluno) comboBoxAluno.getSelectedItem();
             if (alunoSelecionado != null) {
-                String caminhoArquivo = "C:\\Users\\DevTarde\\Documents\\Ezequielzz\\PROJETO-JAVA\\frequencia_aluno" + alunoSelecionado.getId() + ".txt"; // Defina o caminho
+                String caminhoArquivo = "F:\\Samuel SENAI\\PROJETO-JAVA\\frequencia_aluno"
+                        + alunoSelecionado.getId() + ".txt"; // Defina o caminho
                 relatorioController.gerarRelatorioFrequencia(alunoSelecionado.getId(), caminhoArquivo);
             } else {
                 JOptionPane.showMessageDialog(null, "Por favor, selecione um aluno.");

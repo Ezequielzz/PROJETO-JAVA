@@ -97,5 +97,58 @@ public class ProfessorDAO {
             throw new SQLException("Erro ao excluir professor", e);
         }
     }
+
+    public void atualizarProfessor(Professor professor) throws SQLException {
+        String sql = "UPDATE professor SET nome = ?, cpf = ?, data_nascimento = ?, endereco = ?, telefone = ?, senha = ? WHERE id = ?";
+
+        try (Connection connection = ConnectionFactory.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setString(1, professor.getNome());
+            stmt.setString(2, professor.getCpf());
+            stmt.setDate(3, new java.sql.Date(professor.getDataNascimento().getTime()));
+            stmt.setString(4, professor.getEndereco());
+            stmt.setString(5, professor.getTelefone());
+            stmt.setString(6, professor.getSenha());
+            stmt.setInt(7, professor.getId());
+
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("Nenhum professor encontrado com o ID fornecido.");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException("Erro ao atualizar professor", e);
+        }
+    }
+
+    public Professor buscarProfessorPorId(int id) throws SQLException {
+        String sql = "SELECT * FROM professor WHERE id = ?";
+        Professor professor = null;
+    
+        try (Connection connection = ConnectionFactory.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+    
+            if (rs.next()) {
+                professor = new Professor();
+                professor.setId(rs.getInt("id"));
+                professor.setNome(rs.getString("nome"));
+                professor.setCpf(rs.getString("cpf"));
+                professor.setDataNascimento(rs.getDate("data_nascimento"));
+                professor.setEndereco(rs.getString("endereco"));
+                professor.setTelefone(rs.getString("telefone"));
+                professor.setSenha(rs.getString("senha"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException("Erro ao buscar professor por ID", e);
+        }
+    
+        return professor;
+    }
 }
 
