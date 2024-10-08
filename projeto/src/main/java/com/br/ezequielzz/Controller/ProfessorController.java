@@ -2,6 +2,7 @@ package com.br.ezequielzz.Controller;
 
 import com.br.ezequielzz.Model.*;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -51,5 +52,8 @@ public class ProfessorController {
         }
     }
 
+    public void excluirProfessor(int professorId) throws SQLException {
+        professorDAO.excluirProfessor(professorId);
+    }
 
 }

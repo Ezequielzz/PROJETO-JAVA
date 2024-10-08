@@ -80,5 +80,22 @@ public class ProfessorDAO {
         }
     }
 
+    public void excluirProfessor(int professorId) throws SQLException {
+        String sql = "DELETE FROM professor WHERE id = ?";
+
+        try (Connection connection = ConnectionFactory.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setInt(1, professorId);
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("Nenhum professor encontrado com o ID fornecido.");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException("Erro ao excluir professor", e);
+        }
+    }
 }
 

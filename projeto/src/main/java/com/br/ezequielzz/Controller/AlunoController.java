@@ -3,6 +3,7 @@ package com.br.ezequielzz.Controller;
 import com.br.ezequielzz.Model.Aluno;
 import com.br.ezequielzz.Model.AlunoDAO;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class AlunoController {
@@ -31,10 +32,12 @@ public class AlunoController {
         return alunoDAO.listarAlunosPorTurma(turmaId);
     }
 
-    public List<String> consultarHistorico(int alunoId) {
-        // Chama o DAO para consultar o histórico no banco
-        return alunoDAO.consultarHistorico(alunoId);
+    public void excluirAluno(int alunoId) throws SQLException {
+        alunoDAO.excluirAluno(alunoId);
     }
 
+    public void atualizarAluno(Aluno aluno) throws SQLException {
+        alunoDAO.atualizarAluno(aluno);
+    }
 
 }

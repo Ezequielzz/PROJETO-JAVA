@@ -4,9 +4,11 @@ import com.br.ezequielzz.Controller.*;
 import com.br.ezequielzz.Model.*;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -197,6 +199,30 @@ public class EscolaView extends JFrame {
         JScrollPane scrollPane = new JScrollPane(tabelProfessores);
         panel.add(scrollPane, BorderLayout.CENTER);
 
+        // Criar painel para os botões
+        JPanel botaoPanel = new JPanel();
+
+        // Botão de Excluir
+        JButton btnExcluir = new JButton("Excluir");
+        btnExcluir.addActionListener(e -> {
+            int linhaSelecionada = tabelProfessores.getSelectedRow();
+            if (linhaSelecionada != -1) {
+                int professorId = (int) dados[linhaSelecionada][0]; // ID do aluno
+                try {
+                    professorController.excluirProfessor(professorId);
+                    JOptionPane.showMessageDialog(panel, "Professor excluído com sucesso!");
+                    atualizarTabela(tabelProfessores); // Atualiza a tabela após exclusão
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(panel, "Erro ao excluir professor: " + ex.getMessage());
+                }
+            } else {
+                JOptionPane.showMessageDialog(panel, "Selecione um professor para excluir.");
+            }
+        });
+
+        botaoPanel.add(btnExcluir);
+        panel.add(botaoPanel, BorderLayout.NORTH);
+
         return panel;
     }
 
@@ -205,8 +231,7 @@ public class EscolaView extends JFrame {
         panel.setLayout(new BorderLayout());
 
         // Definir os nomes das colunas
-        String[] colunas = {"ID", "Nome", "CPF", "Data de Nascimento", "Endereço", "Telefone", "Turma",
-                " Situação Matrícula"};
+        String[] colunas = {"ID", "Nome", "CPF", "Data de Nascimento", "Endereço", "Telefone", "Turma", "Situação Matrícula"};
 
         // Obter os dados dos alunos
         java.util.List<Aluno> alunos = alunoController.listarTodosAlunos();
@@ -228,13 +253,51 @@ public class EscolaView extends JFrame {
 
         // Criar a tabela
         JTable tabelaAlunos = new JTable(dados, colunas);
+        tabelaAlunos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // Permitir seleção de uma linha
 
         // Adicionar a tabela a um JScrollPane para permitir a rolagem
         JScrollPane scrollPane = new JScrollPane(tabelaAlunos);
         panel.add(scrollPane, BorderLayout.CENTER);
 
+        // Criar painel para os botões
+        JPanel botaoPanel = new JPanel();
+
+        // Botão de Excluir
+        JButton btnExcluir = new JButton("Excluir");
+        btnExcluir.addActionListener(e -> {
+            int linhaSelecionada = tabelaAlunos.getSelectedRow();
+            if (linhaSelecionada != -1) {
+                int alunoId = (int) dados[linhaSelecionada][0]; // ID do aluno
+                try {
+                    alunoController.excluirAluno(alunoId);
+                    JOptionPane.showMessageDialog(panel, "Aluno excluído com sucesso!");
+                    atualizarTabela(tabelaAlunos); // Atualiza a tabela após exclusão
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(panel, "Erro ao excluir aluno: " + ex.getMessage());
+                }
+            } else {
+                JOptionPane.showMessageDialog(panel, "Selecione um aluno para excluir.");
+            }
+        });
+
+        botaoPanel.add(btnExcluir);
+        panel.add(botaoPanel, BorderLayout.NORTH);
+
         return panel;
     }
+
+
+
+    private void atualizarTabela() {
+        tableModel.setRowCount(0);
+        contatos = new ContatoDAO().listarTodos();
+
+        for (Contato contato : contatos) {
+            tableModel.addRow(new Object[] { aluno.getNome(), aluno.getCpf(), aluno.getTelefone(), aluno.getDataNascimento(), aluno.getEndereco(), aluno.getEndereco());
+        }
+    }
+
+
 
     private JPanel criarAlunoPanel() {
         JPanel panel = new JPanel();
@@ -615,6 +678,12 @@ public class EscolaView extends JFrame {
         painel.add(labelTurma);
         painel.add(comboBoxTurma);
 
+        // Label e JComboBox para selecionar o professor
+        JLabel labelProfessor = new JLabel("Selecione o Professor:");
+        JComboBox<Professor> comboBoxProfessor = new JComboBox<>();
+        painel.add(labelProfessor);
+        painel.add(comboBoxProfessor);
+
         // Botão para criar disciplina
         JButton botaoCriarDisciplina = new JButton("Criar Disciplina");
         painel.add(botaoCriarDisciplina);
@@ -625,15 +694,22 @@ public class EscolaView extends JFrame {
             comboBoxTurma.addItem(turma);
         }
 
+        // Preenchendo JComboBox com os professores do banco de dados
+        List<Professor> professores = professorController.listarTodosProfessores();
+        for (Professor professor : professores) {
+            comboBoxProfessor.addItem(professor);
+        }
+
         // Ação do botão para criar a disciplina
         botaoCriarDisciplina.addActionListener(e -> {
             String nomeDisciplina = campoNome.getText();
             Turma turmaSelecionada = (Turma) comboBoxTurma.getSelectedItem();
+            Professor professorSelecionado = (Professor) comboBoxProfessor.getSelectedItem();
 
             if (nomeDisciplina.isEmpty() || turmaSelecionada == null) {
                 JOptionPane.showMessageDialog(null, "Por favor, preencha todos os campos.");
             } else {
-                Disciplina disciplina = new Disciplina(0, nomeDisciplina, turmaSelecionada.getTurmaId());
+                Disciplina disciplina = new Disciplina(0, nomeDisciplina, turmaSelecionada.getTurmaId(), professorSelecionado.getProfessorId());
                 disciplinaController.criarDisciplina(disciplina);
                 JOptionPane.showMessageDialog(null, "Disciplina criada com sucesso!");
             }

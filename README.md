@@ -2,7 +2,7 @@
 
 - O **Sistema de Gerenciamento Escolar** visa facilitar a administração de uma escola, oferecendo funcionalidades como o
   cadastro de alunos, professores e turmas, o controle de notas e frequências, além da geração de relatórios para
-  acompanhamento do desempenho acadêmico e gestão de matrículas. O sistema também pode incluir um portal para pais e
+  acompanhamento do desempenho acadêmico. O sistema também poderia incluir um portal para pais e
   alunos, oferecendo acesso a informações relevantes, como boletins e horários de aula.
 
 ## Escopo do Sistema
@@ -13,17 +13,15 @@
 
     - Nome completo, CPF, data de nascimento, endereço, telefone.
     - Informações acadêmicas: série, turma, status da matrícula (ativo, transferido, desligado).
-    - Histórico escolar: disciplinas cursadas e resultados anteriores.
 
 - **Atualização de Dados**: Deve ser possível atualizar dados do aluno, como mudança de endereço ou alteração no status
   da
   matrícula.
 
-- **Transferência e Desligamento**: Função para registrar e documentar transferências para outras escolas ou o
-  desligamento
+- **Transferência e Desligamento**: Função para o desligamento
   do aluno.
 
-- **Listagem e Filtragem**: Possibilidade de listar alunos por série, turma, ou filtrar por status (ativo, transferido).
+- **Listagem e Filtragem**: Possibilidade de listar alunos por turma.
 
 ### 2. Cadastro de Professores:
 
@@ -32,10 +30,7 @@
     - Nome completo, CPF, departamento, disciplinas lecionadas.
     - Informações de contato (endereço, telefone, e-mail).
 
-- **Atualização de Informações**: Permitir a atualização de dados, como a mudança de disciplinas lecionadas ou de
-  departamento.
-
-- **Histórico de Disciplinas**: Registro das disciplinas que o professor já lecionou e a carga horária correspondente.
+- **Atualização de Informações**: Permitir a atualização de dados, como a mudança de disciplinas lecionadas ou d
 
 ### 3. Gerenciamento de Turmas e Disciplinas:
 
@@ -52,35 +47,24 @@
 ### 4. Controle Acadêmico:
 
    - **Notas**:
-     - Registro das notas de cada aluno por disciplina e por bimestre.
-     - Cálculo automático das médias bimestrais e finais, com base nos critérios definidos pela escola.
+     - Registro das notas de cada aluno por disciplina.
 
    - **Frequência**:
      - Registro diário da frequência dos alunos, considerando presença.
      - Relatórios de presença que ajudam a identificar alunos com problemas de assiduidade.
 
-   - **Histórico Acadêmico**: Geração de um histórico acadêmico completo para cada aluno, listando suas notas, disciplinas cursadas e frequências ao longo dos anos.
-
 ### 6. Emissão de Boletins e Relatórios:
 
    - **Boletins**:
-     - Geração de boletins escolares, com as notas por disciplina, média geral e situação final (aprovado/reprovado).
+     - Geração de boletins escolares, com as notas por disciplina.
      - O boletim pode ser emitido, com formato pronto para ser entregue aos alunos ou enviado por e-mail.
 
    - Relatórios de Frequência:
-     - Relatório detalhado da frequência por aluno ou por turma, com total de faltas, justificativas e alertas para acompanhamento de pais e professores.
-
-   - Relatórios Administrativos:
-     - Relatórios sobre o desempenho geral das turmas e séries, permitindo uma análise detalhada do rendimento acadêmico por disciplina e período.
+     - Relatório detalhado da frequência por aluno com total de faltas.
 
 ### 7. Interface Gráfica para Interação com o Sistema:
 
    - **Painel de Controle**: Um painel inicial que permite aos usuários acessar as funcionalidades principais, como cadastro de alunos, lançamentos de notas e emissão de relatórios.
-
-   - **Sistema de Login**: Controle de acesso com diferentes níveis de permissão, garantindo que administradores, professores e alunos tenham acesso adequado às informações e funcionalidades do sistema.
-     - Administrador: Acesso total para cadastro e gerenciamento de usuários, turmas e disciplinas.
-     - Professor: Permissões para lançar notas, controlar frequência e emitir relatórios de sua turma.
-     - Aluno/Pais: Consulta de boletins, notas e relatórios de presença.
 
    - **Navegação Intuitiva**: A interface gráfica deve ser simples e organizada, com menus claros para fácil navegação entre as diferentes áreas do sistema.
 
@@ -90,9 +74,7 @@
 
 ### 9. Geração de Relatórios Detalhados:
 
-   - **Relatório de Alunos Ativos**: Listagem de todos os alunos ativos, com filtros por série, turma, e status de matrícula.
-   - **Relatório de Professores**: Detalhamento dos professores, disciplinas atribuídas e carga horária.
-   - **Relatório de Desempenho Acadêmico**: Informações sobre notas e frequência de todos os alunos, com possibilidade de filtrar por turma ou disciplina.
+   - **Relatório de Desempenho Acadêmico**: Informações sobre notas e frequência de todos os alunos.
    - **Exportação**: Todos os relatórios devem ser exportáveis em PDF, CSV ou TXT, facilitando o armazenamento e a entrega dos dados aos interessados.
 
 ## Diagramas.
@@ -226,6 +208,64 @@
     <img src="/img/Diagrama de Fluxo.png">
   </div>
 
+Claro! Vamos organizar os resultados dos testes de forma clara e estruturada. Aqui está a formatação corrigida para os resultados dos testes:
+
+---
+
+### Testes Unitários
+
+-------------------------------------------------------------------------------
+**Test set: AlunoDAOTest**  
+**Tests run:** 3  
+**Failures:** 0  
+**Errors:** 0  
+**Skipped:** 0  
+**Time elapsed:** 2.579 s  
+**Status:** Sucesso
+
+-------------------------------------------------------------------------------
+**Test set: DisciplinaDAOTest**  
+**Tests run:** 4  
+**Failures:** 4  
+**Errors:** 0  
+**Skipped:** 0  
+**Time elapsed:** 2.075 s  
+**Status:** Falha
+- **DisciplinaDAOTest.testConsultarNotasAluno**
+    - **Tempo decorrido:** 1.688 s
+    - **Erro:** `org.opentest4j.AssertionFailedError: expected: <1> but was: <0>`
+
+- **DisciplinaDAOTest.testCriarDisciplina**
+    - **Tempo decorrido:** 0.122 s
+    - **Erro:** `Wanted but not invoked: preparedStatement.executeUpdate(); Actually, there were zero interactions with this mock.`
+
+- **DisciplinaDAOTest.testBuscarDisciplinaPorId**
+    - **Tempo decorrido:** 0.115 s
+    - **Erro:** `org.opentest4j.AssertionFailedError: expected: not <null>`
+
+- **DisciplinaDAOTest.testBuscarDisciplinasPorTurma**
+    - **Tempo decorrido:** 0.122 s
+    - **Erro:** `org.opentest4j.AssertionFailedError: expected: <1> but was: <0>`
+
+-------------------------------------------------------------------------------
+**Test set: NotaDAOTest**  
+**Tests run:** 3  
+**Failures:** 2  
+**Errors:** 0  
+**Skipped:** 0  
+**Time elapsed:** 0.302 s  
+**Status:** Falha
+- **NotaDAOTest.testRegistrarNota**
+    - **Tempo decorrido:** 0.112 s
+    - **Erro:** `Wanted but not invoked: preparedStatement.executeUpdate(); Actually, there were zero interactions with this mock.`
+
+- **NotaDAOTest.testAtualizarNota**
+    - **Tempo decorrido:** 0.096 s
+    - **Erro:** `Wanted but not invoked: preparedStatement.executeUpdate(); Actually, there were zero interactions with this mock.`
+
+---
+
+Se precisar de mais alguma coisa, como sugestões para corrigir os erros, é só avisar!
 ### Schema Tabela
 
 CREATE TABLE Aluno (
@@ -294,3 +334,14 @@ tipo_relatorio VARCHAR(50) CHECK (tipo_relatorio IN ('boletim', 'frequência', '
 data_geracao DATE NOT NULL,
 dados_relatorio TEXT
 );
+
+CREATE TABLE turma_professor (
+turma_id INT REFERENCES Turma(id) ON DELETE CASCADE,
+professor_id INT REFERENCES Professor(id) ON DELETE CASCADE,
+PRIMARY KEY (turma_id, professor_id)
+);
+
+
+-- Adicionando referência do professor na tabela Disciplina
+ALTER TABLE Disciplina
+ADD COLUMN professor_id INT REFERENCES Professor(id) ON DELETE SET NULL;

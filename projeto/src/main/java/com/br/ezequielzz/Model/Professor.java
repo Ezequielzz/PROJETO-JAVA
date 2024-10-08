@@ -1,6 +1,7 @@
 package com.br.ezequielzz.Model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class Professor extends Pessoa {
     private int professorId;
     List<Disciplina> disciplinas;

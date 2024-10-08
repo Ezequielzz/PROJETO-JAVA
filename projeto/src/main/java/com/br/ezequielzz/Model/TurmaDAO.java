@@ -1,8 +1,7 @@
 package com.br.ezequielzz.Model;
 
-import com.br.ezequielzz.Model.Aluno;
 import com.br.ezequielzz.Model.Database.ConnectionFactory;
-import com.br.ezequielzz.Model.Turma;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,35 +12,145 @@ import java.util.List;
 public class TurmaDAO {
 
     public void criarTurma(Turma turma) {
-        String sql = "INSERT INTO Turma (serie, ano_letivo, turno, sala) VALUES (?, ?, ?, ?)";
+        String sqlTurma = "INSERT INTO Turma (serie, ano_letivo, turno, sala) VALUES (?, ?, ?, ?)";
+        String sqlTurmaProfessor = "INSERT INTO Turma_Professor (turma_id, professor_id) VALUES (?, ?)";
 
-        try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+        Connection conn = null;
+        try {
+            // Abre a conexão fora do try-with-resources
+            conn = ConnectionFactory.getConnection();
+            conn.setAutoCommit(false); // Desabilita autocommit para trabalhar com transações
 
-            stmt.setString(1, turma.getSerie());
-            stmt.setString(2, turma.getAnoLetivo());
-            stmt.setString(3, turma.getTurno());
-            stmt.setString(4, turma.getSala());
-            stmt.executeUpdate();
+            // Inserir a turma
+            try (PreparedStatement stmtTurma = conn.prepareStatement(sqlTurma, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                stmtTurma.setString(1, turma.getSerie());
+                stmtTurma.setString(2, turma.getAnoLetivo());
+                stmtTurma.setString(3, turma.getTurno());
+                stmtTurma.setString(4, turma.getSala());
+                stmtTurma.executeUpdate();
 
-            // Recupera o ID gerado
-            ResultSet rs = stmt.getGeneratedKeys();
-            if (rs.next()) {
-                turma.setTurmaId(rs.getInt(1));
+                // Recupera o ID da turma gerada
+                ResultSet rs = stmtTurma.getGeneratedKeys();
+                if (rs.next()) {
+                    turma.setTurmaId(rs.getInt(1));
+                }
             }
+
+            // Inserir professores na tabela intermediária
+            try (PreparedStatement stmtTurmaProfessor = conn.prepareStatement(sqlTurmaProfessor)) {
+                for (Professor professor : turma.getProfessores()) {
+                    stmtTurmaProfessor.setInt(1, turma.getTurmaId());
+                    stmtTurmaProfessor.setInt(2, professor.getId());
+                    stmtTurmaProfessor.addBatch();  // Adiciona ao batch
+                }
+                stmtTurmaProfessor.executeBatch();  // Executa todas as inserções em lote
+            }
+
+            // Confirma a transação se tudo estiver correto
+            conn.commit();
+
         } catch (SQLException e) {
             e.printStackTrace();
+            if (conn != null) {
+                try {
+                    conn.rollback();  // Reverte a transação no caso de erro
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
+            }
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true); // Restaura o autocommit ao valor padrão
+                    conn.close();  // Fecha a conexão
+                } catch (SQLException closeEx) {
+                    closeEx.printStackTrace();
+                }
+            }
         }
     }
 
-    public void adicionarAlunoNaTurma(Turma turma, Aluno aluno) {
-        String sql = "UPDATE Aluno SET turma_id = ? WHERE aluno_id = ?";
+    public void adicionarProfessorATurma(Turma turma, Professor professor) {
+        String sql = "INSERT INTO turma_professor (turma_id, professor_id) VALUES (?, ?)";
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, turma.getTurmaId());
-            stmt.setInt(2, aluno.getId());
+            stmt.setInt(2, professor.getId());
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    public void adicionarProfessorNaTurma(int turmaId, int professorId) {
+        String sql = "UPDATE Turma SET professor_id = ? WHERE id = ?";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, professorId);
+            stmt.setInt(2, turmaId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<Turma> listarTodasTurmas() {
+        String sql = "SELECT t.*, p.id AS professor_id, p.nome AS professor_nome FROM Turma t "
+                + "LEFT JOIN Turma_Professor tp ON t.id = tp.turma_id "
+                + "LEFT JOIN Professor p ON tp.professor_id = p.id";
+        List<Turma> turmas = new ArrayList<>();
+        Turma turmaAtual = null;
+        int turmaIdAtual = -1;
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                int turmaId = rs.getInt("id");
+
+                // Se a turma atual é diferente da do próximo resultado, cria uma nova Turma
+                if (turmaId != turmaIdAtual) {
+                    turmaAtual = new Turma(
+                            turmaId,
+                            rs.getString("serie"),
+                            rs.getString("ano_letivo"),
+                            rs.getString("turno"),
+                            rs.getString("sala")
+                    );
+                    turmas.add(turmaAtual);
+                    turmaIdAtual = turmaId;
+                }
+
+                // Se houver um professor associado, adicione à lista de professores
+                if (rs.getInt("professor_id") > 0) {
+                    Professor professor = new Professor();
+                    professor.setId(rs.getInt("professor_id"));
+                    professor.setNome(rs.getString("professor_nome"));
+                    turmaAtual.getProfessores().add(professor);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return turmas;
+    }
+
+    public void adicionarAlunoNaTurma(Turma turma, Aluno aluno) {
+        String sql = "INSERT INTO Matricula (aluno_id, turma_id, data_matricula, status) VALUES (?, ?, CURRENT_DATE, 'matriculado')";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, aluno.getId());
+            stmt.setInt(2, turma.getTurmaId());
             stmt.executeUpdate();
 
         } catch (SQLException e) {
@@ -50,12 +159,13 @@ public class TurmaDAO {
     }
 
     public void removerAlunoDaTurma(Turma turma, Aluno aluno) {
-        String sql = "UPDATE Aluno SET turma_id = NULL WHERE aluno_id = ?";
+        String sql = "UPDATE Matricula SET status = 'cancelado' WHERE aluno_id = ? AND turma_id = ?";
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, aluno.getId());
+            stmt.setInt(2, turma.getTurmaId());
             stmt.executeUpdate();
 
         } catch (SQLException e) {
@@ -63,34 +173,9 @@ public class TurmaDAO {
         }
     }
 
-    public List<Turma> listarTodasTurmas() {
-        String sql = "SELECT * FROM Turma";
-        List<Turma> turmas = new ArrayList<>();
-
-        try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                Turma turma = new Turma(
-                        rs.getInt("id"),
-                        rs.getString("serie"),
-                        rs.getString("ano_letivo"),
-                        rs.getString("turno"),
-                        rs.getString("sala")
-                );
-                turmas.add(turma);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return turmas;
-    }
-
     public Turma buscarPorDisciplina(int disciplinaId) {
         String sql = "SELECT t.* FROM Turma t "
-                + "JOIN Disciplina d ON t.turma_id = d.turma_id "
+                + "JOIN Disciplina d ON t.id = d.turma_id "
                 + "WHERE d.id = ?";
 
         try (Connection conn = ConnectionFactory.getConnection();
@@ -101,7 +186,7 @@ public class TurmaDAO {
 
             if (rs.next()) {
                 return new Turma(
-                        rs.getInt("turma_id"),
+                        rs.getInt("id"),
                         rs.getString("serie"),
                         rs.getString("ano_letivo"),
                         rs.getString("turno"),

@@ -13,14 +13,16 @@ import java.util.List;
 
 public class DisciplinaDAO {
 
+
     public void criarDisciplina(Disciplina disciplina) {
-        String sql = "INSERT INTO Disciplina (nome, turma_id) VALUES (?, ?)";
+        String sql = "INSERT INTO Disciplina (nome, turma_id, professor_id) VALUES (?, ?, ?)";
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, disciplina.getNome());
             stmt.setInt(2, disciplina.getTurmaId());
+            stmt.setInt(3, disciplina.getProfessorId());
             stmt.executeUpdate();
 
             // Recupera o ID gerado
@@ -33,6 +35,36 @@ public class DisciplinaDAO {
             e.printStackTrace();
         }
     }
+
+    // Buscar disciplinas por turma com professor
+    public List<Disciplina> buscarDisciplinasPorTurma(int turmaId) {
+        String sql = "SELECT d.*, p.nome AS professor_nome FROM Disciplina d "
+                + "LEFT JOIN Professor p ON d.professor_id = p.id "
+                + "WHERE d.turma_id = ?";
+        List<Disciplina> disciplinas = new ArrayList<>();
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, turmaId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Disciplina disciplina = new Disciplina(
+                        rs.getInt("id"),
+                        rs.getString("nome"),
+                        rs.getInt("turma_id"),
+                        rs.getInt("professor_id")
+                );
+                disciplinas.add(disciplina);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return disciplinas;
+    }
+
 
     public List<Nota> consultarNotasAluno(Disciplina disciplina, Aluno aluno) {
         String sql = "SELECT * FROM Nota WHERE aluno_id = ? AND disciplina_id = ?";
@@ -77,7 +109,8 @@ public class DisciplinaDAO {
                 disciplina = new Disciplina(
                         rs.getInt("id"),
                         rs.getString("nome"),
-                        rs.getInt("turma_id")
+                        rs.getInt("turma_id"),
+                        rs.getInt("professor_id")
                 );
             }
 
@@ -86,32 +119,5 @@ public class DisciplinaDAO {
         }
 
         return disciplina;
-    }
-
-    // Buscar disciplinas por turma
-    public List<Disciplina> buscarDisciplinasPorTurma(int turmaId) {
-        String sql = "SELECT * FROM Disciplina WHERE turma_id = ?";
-        List<Disciplina> disciplinas = new ArrayList<>();
-
-        try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, turmaId);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                Disciplina disciplina = new Disciplina(
-                        rs.getInt("id"),
-                        rs.getString("nome"),
-                        rs.getInt("turma_id")
-                );
-                disciplinas.add(disciplina);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return disciplinas;
     }
 }
