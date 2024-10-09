@@ -42,7 +42,7 @@ class DisciplinaDAOTest {
     @Test
     void testCriarDisciplina() throws SQLException {
         // Cria uma disciplina de exemplo
-        Disciplina disciplina = new Disciplina(1, "Matemática", 4, 1);
+        Disciplina disciplina = new Disciplina(1, "Matemática", 4);
 
         // Simula o comportamento do executeUpdate
         when(preparedStatement.executeUpdate()).thenReturn(1);
@@ -86,7 +86,7 @@ class DisciplinaDAOTest {
     @Test
     void testConsultarNotasAluno() throws SQLException {
         // Cria objetos de exemplo
-        Disciplina disciplina = new Disciplina(1, "Matemática", 4, 1);
+        Disciplina disciplina = new Disciplina(1, "Matemática", 4);
         Aluno aluno = new Aluno(1, "João", "12345678955", new Date(), "Rua A", "123456", "senha123", 4, "ativo");
 
         // Simula o comportamento do executeQuery

@@ -888,16 +888,14 @@ public class EscolaView extends JFrame {
         botaoCriarDisciplina.addActionListener(e -> {
             String nomeDisciplina = campoNome.getText();
             Turma turmaSelecionada = (Turma) comboBoxTurma.getSelectedItem();
-            Professor professorSelecionado = (Professor) comboBoxProfessor.getSelectedItem();
-
             if (nomeDisciplina.isEmpty() || turmaSelecionada == null) {
                 JOptionPane.showMessageDialog(null, "Por favor, preencha todos os campos.");
             } else {
-                Disciplina disciplina = new Disciplina(0, nomeDisciplina, turmaSelecionada.getTurmaId(),
-                        professorSelecionado.getProfessorId());
+                Disciplina disciplina = new Disciplina(0, nomeDisciplina, turmaSelecionada.getTurmaId());
                 disciplinaController.criarDisciplina(disciplina);
                 JOptionPane.showMessageDialog(null, "Disciplina criada com sucesso!");
             }
+            
         });
 
         return painel;

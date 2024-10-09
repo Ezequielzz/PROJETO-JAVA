@@ -1,0 +1,3 @@
+Boletim do Aluno ID: 31
+Disciplina: Matemática - Nota: 9.0
+Disciplina: Geografia - Nota: 8.0

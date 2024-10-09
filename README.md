@@ -335,12 +335,6 @@ data_geracao DATE NOT NULL,
 dados_relatorio TEXT
 );
 
-CREATE TABLE turma_professor (
-turma_id INT REFERENCES Turma(id) ON DELETE CASCADE,
-professor_id INT REFERENCES Professor(id) ON DELETE CASCADE,
-PRIMARY KEY (turma_id, professor_id)
-);
-
 
 -- Adicionando referência do professor na tabela Disciplina
 ALTER TABLE Disciplina
