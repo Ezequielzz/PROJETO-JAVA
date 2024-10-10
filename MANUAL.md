@@ -1,5 +1,3 @@
-Vamos adicionar a seção dos novos painéis e funcionalidades ao seu manual, incorporando os detalhes sobre o painel de listagem de alunos e a funcionalidade de criação de alunos. Aqui está a versão atualizada do manual:
-
 # Manual de Uso do Sistema de Gerenciamento Escolar
 
 ## Índice
