@@ -208,10 +208,6 @@
     <img src="/img/Diagrama de Fluxo.png">
   </div>
 
-Claro! Vamos organizar os resultados dos testes de forma clara e estruturada. Aqui está a formatação corrigida para os resultados dos testes:
-
----
-
 ### Testes Unitários
 
 -------------------------------------------------------------------------------
@@ -265,7 +261,6 @@ Claro! Vamos organizar os resultados dos testes de forma clara e estruturada. Aq
 
 ---
 
-Se precisar de mais alguma coisa, como sugestões para corrigir os erros, é só avisar!
 ### Schema Tabela
 
 CREATE TABLE Aluno (
