@@ -5,6 +5,8 @@ import lombok.Setter;
 
 import java.util.Date;
 
+import com.br.ezequielzz.Model.DAOs.RelatorioDAO;
+
 @Getter
 @Setter
 public class Relatorio {

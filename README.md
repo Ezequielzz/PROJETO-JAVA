@@ -266,7 +266,7 @@
 CREATE TABLE Aluno (
 id SERIAL PRIMARY KEY,
 nome VARCHAR(100) NOT NULL,
-cpf VARCHAR(11) UNIQUE NOT NULL,
+cpf VARCHAR(14) UNIQUE NOT NULL,
 data_nascimento DATE NOT NULL,
 endereco VARCHAR(200),
 telefone VARCHAR(15),
@@ -278,7 +278,7 @@ status_matricula VARCHAR(20) CHECK (status_matricula IN ('ativo', 'transferido',
 CREATE TABLE Professor (
 id SERIAL PRIMARY KEY,
 nome VARCHAR(100) NOT NULL,
-cpf VARCHAR(11) UNIQUE NOT NULL,
+cpf VARCHAR(14) UNIQUE NOT NULL,
 data_nascimento DATE NOT NULL,
 endereco VARCHAR(200),
 telefone VARCHAR(15),

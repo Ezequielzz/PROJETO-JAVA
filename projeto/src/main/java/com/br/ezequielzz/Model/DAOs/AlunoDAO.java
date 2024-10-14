@@ -1,5 +1,6 @@
-package com.br.ezequielzz.Model;
+package com.br.ezequielzz.Model.DAOs;
 
+import com.br.ezequielzz.Model.Aluno;
 import com.br.ezequielzz.Model.Database.ConnectionFactory;
 
 import java.sql.Connection;

@@ -2,7 +2,7 @@ package com.br.ezequielzz.Controller;
 
 import com.br.ezequielzz.Model.Aluno;
 import com.br.ezequielzz.Model.Relatorio;
-import com.br.ezequielzz.Model.RelatorioDAO;
+import com.br.ezequielzz.Model.DAOs.RelatorioDAO;
 
 import java.io.BufferedWriter;
 import java.util.Date;

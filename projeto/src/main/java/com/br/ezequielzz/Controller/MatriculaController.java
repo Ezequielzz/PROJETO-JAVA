@@ -1,7 +1,7 @@
 package com.br.ezequielzz.Controller;
 
 import com.br.ezequielzz.Model.Matricula;
-import com.br.ezequielzz.Model.MatriculaDAO;
+import com.br.ezequielzz.Model.DAOs.MatriculaDAO;
 
 public class MatriculaController {
     private MatriculaDAO matriculaDAO;

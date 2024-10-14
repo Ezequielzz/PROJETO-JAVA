@@ -5,6 +5,8 @@ import lombok.Setter;
 
 import java.util.Date;
 
+import com.br.ezequielzz.Model.DAOs.NotaDAO;
+
 @Getter
 @Setter
 public class Nota {

@@ -1,5 +1,6 @@
 import com.br.ezequielzz.Model.Nota;
-import com.br.ezequielzz.Model.NotaDAO;
+import com.br.ezequielzz.Model.DAOs.NotaDAO;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;

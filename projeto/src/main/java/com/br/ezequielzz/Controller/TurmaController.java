@@ -3,7 +3,7 @@ package com.br.ezequielzz.Controller;
 import java.sql.SQLException;
 
 import com.br.ezequielzz.Model.Turma;
-import com.br.ezequielzz.Model.TurmaDAO;
+import com.br.ezequielzz.Model.DAOs.TurmaDAO;
 import com.br.ezequielzz.Model.Aluno;
 
 import java.util.List;

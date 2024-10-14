@@ -1,7 +1,7 @@
 package com.br.ezequielzz.Controller;
 
 import com.br.ezequielzz.Model.Nota;
-import com.br.ezequielzz.Model.NotaDAO;
+import com.br.ezequielzz.Model.DAOs.NotaDAO;
 
 public class NotaController {
 

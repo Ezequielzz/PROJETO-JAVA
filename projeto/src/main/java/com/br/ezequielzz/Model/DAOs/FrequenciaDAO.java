@@ -1,5 +1,6 @@
-package com.br.ezequielzz.Model;
+package com.br.ezequielzz.Model.DAOs;
 
+import com.br.ezequielzz.Model.Frequencia;
 import com.br.ezequielzz.Model.Database.ConnectionFactory;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

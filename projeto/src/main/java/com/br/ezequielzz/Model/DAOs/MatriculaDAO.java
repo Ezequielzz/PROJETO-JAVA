@@ -1,9 +1,11 @@
-package com.br.ezequielzz.Model;
+package com.br.ezequielzz.Model.DAOs;
 
+import com.br.ezequielzz.Model.Matricula;
 import com.br.ezequielzz.Model.Database.ConnectionFactory;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Date;
 
 public class MatriculaDAO {
 
@@ -15,7 +17,7 @@ public class MatriculaDAO {
 
             stmt.setInt(1, matricula.getAlunoId());
             stmt.setInt(2, matricula.getTurmaId());
-            stmt.setDate(3, new java.sql.Date(matricula.getDataMatricula().getTime()));
+            stmt.setDate(3, new Date(matricula.getDataMatricula().getTime()));
             stmt.setString(4, matricula.getStatus());
             stmt.executeUpdate();
 

@@ -1,7 +1,7 @@
 package com.br.ezequielzz.Controller;
 
 import com.br.ezequielzz.Model.Frequencia;
-import com.br.ezequielzz.Model.FrequenciaDAO;
+import com.br.ezequielzz.Model.DAOs.FrequenciaDAO;
 
 import java.util.Date;
 import java.util.List;

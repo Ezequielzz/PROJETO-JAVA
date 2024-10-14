@@ -1,7 +1,8 @@
 import com.br.ezequielzz.Model.Aluno;
 import com.br.ezequielzz.Model.Disciplina;
-import com.br.ezequielzz.Model.DisciplinaDAO;
 import com.br.ezequielzz.Model.Nota;
+import com.br.ezequielzz.Model.DAOs.DisciplinaDAO;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;

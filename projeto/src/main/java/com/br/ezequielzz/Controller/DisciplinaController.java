@@ -2,8 +2,8 @@ package com.br.ezequielzz.Controller;
 
 import com.br.ezequielzz.Model.Aluno;
 import com.br.ezequielzz.Model.Disciplina;
-import com.br.ezequielzz.Model.DisciplinaDAO;
 import com.br.ezequielzz.Model.Nota;
+import com.br.ezequielzz.Model.DAOs.DisciplinaDAO;
 
 import java.util.List;
 

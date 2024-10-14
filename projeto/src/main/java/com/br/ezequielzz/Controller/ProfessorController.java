@@ -1,6 +1,7 @@
 package com.br.ezequielzz.Controller;
 
 import com.br.ezequielzz.Model.*;
+import com.br.ezequielzz.Model.DAOs.ProfessorDAO;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
