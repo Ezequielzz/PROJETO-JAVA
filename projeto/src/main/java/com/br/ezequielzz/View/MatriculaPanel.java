@@ -125,16 +125,6 @@ public class MatriculaPanel {
     
         return panel; // Retorna o painel criado
     }
-    
-
-    // Método para carregar as turmas no JComboBox
-    private void loadTurmas(JComboBox<String> turmaComboBox) {
-        // Exemplo de como carregar as turmas do banco de dados
-        List<Turma> turmas = turmaController.listarTodasTurmas(); // Método que deve retornar a lista de turmas
-        for (Turma turma : turmas) { // Percorre cada turma retornada
-            turmaComboBox.addItem(turma.getTurmaId() + " - " + turma.getSerie()); // Exibe o ID e a série da turma
-        }
-    }
 
     // Método para carregar os alunos no JComboBox
     private void loadAlunos(JComboBox<String> alunoComboBox) {
