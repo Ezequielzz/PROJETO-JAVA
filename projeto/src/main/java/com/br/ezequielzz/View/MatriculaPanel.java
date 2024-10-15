@@ -31,25 +31,44 @@ public class MatriculaPanel {
     public JPanel criarMatriculaPanel() {
         JPanel panel = new JPanel(); // Cria um novo painel
         panel.setLayout(new GridLayout(5, 2)); // Define o layout do painel como uma grade de 5 linhas e 2 colunas
-
+    
         // Label e JComboBox para selecionar o aluno
         JLabel alunoLabel = new JLabel("Aluno:"); // Rótulo para o aluno
         JComboBox<String> alunoComboBox = new JComboBox<>(); // ComboBox para seleção de alunos
         loadAlunos(alunoComboBox); // Carregar os alunos no ComboBox
-
+    
         // Label e JComboBox para selecionar a turma
         JLabel turmaLabel = new JLabel("Turma:"); // Rótulo para a turma
         JComboBox<String> turmaComboBox = new JComboBox<>(); // ComboBox para seleção de turmas
-        loadTurmas(turmaComboBox); // Carregar as turmas no ComboBox
-
+    
+        // Adiciona um listener ao JComboBox de alunos
+        alunoComboBox.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                // Obtém o ID do aluno selecionado
+                String alunoSelecionado = (String) alunoComboBox.getSelectedItem();
+                int alunoId = Integer.parseInt(alunoSelecionado.split("-")[0].trim()); // Obtém o ID do aluno
+    
+                // Limpa o ComboBox de turmas
+                turmaComboBox.removeAllItems();
+    
+                // Carrega a turma do aluno selecionado
+                Turma turma = turmaController.buscarTurmaPorAluno(alunoId); // Método que busca a turma do aluno
+                if (turma != null) {
+                    turmaComboBox.addItem(turma.getTurmaId() + " - " + turma.getSerie()); // Adiciona a turma correspondente ao ComboBox
+                } else {
+                    JOptionPane.showMessageDialog(panel, "Nenhuma turma encontrada para o aluno selecionado."); // Mensagem de erro
+                }
+            }
+        });
+    
         // Label e campo para data de matrícula
         JLabel dataMatriculaLabel = new JLabel("Data de Matrícula:"); // Rótulo para a data de matrícula
         JTextField dataMatriculaField = new JTextField(new SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date())); // Campo para a data de matrícula, pré-preenchido com a data atual
-
+    
         // Label e JComboBox para status da matrícula
         JLabel statusLabel = new JLabel("Status:"); // Rótulo para o status da matrícula
         JComboBox<String> statusComboBox = new JComboBox<>(new String[] { "matriculado" }); // ComboBox para status da matrícula, inicia com "matriculado"
-
+    
         // Botão para efetuar a matrícula
         JButton matricularButton = new JButton("Realizar Matrícula"); // Botão para realizar a matrícula
         matricularButton.addActionListener(new ActionListener() { // Adiciona um listener de ação ao botão
@@ -63,23 +82,23 @@ public class MatriculaPanel {
                         JOptionPane.showMessageDialog(null, "Selecione um aluno e uma turma."); // Mensagem de erro
                         return; // Sai do método se não houver seleção válida
                     }
-
+    
                     // Extrair os IDs do aluno e da turma selecionados
                     int alunoId = Integer.parseInt(alunoSelecionado.split("-")[0].trim()); // Obtém o ID do aluno
                     int turmaId = Integer.parseInt(turmaSelecionada.split("-")[0].trim()); // Obtém o ID da turma
-
+    
                     // Obter a data de matrícula e o status
                     String dataMatriculaStr = dataMatriculaField.getText().trim(); // Obtém a data de matrícula do campo de texto
                     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy"); // Formato da data
                     java.util.Date dataMatricula = formatter.parse(dataMatriculaStr); // Converte a string da data em um objeto Date
                     String status = (String) statusComboBox.getSelectedItem(); // Obtém o status selecionado
-
+    
                     // Criar o objeto Matricula
                     Matricula matricula = new Matricula(0, alunoId, turmaId, dataMatricula, status); // Cria um novo objeto de matrícula
-
+    
                     // Chamar o controller para realizar a matrícula
                     matriculaController.realizarMatricula(matricula); // Chama o método do controlador para realizar a matrícula
-
+    
                     JOptionPane.showMessageDialog(null, "Matrícula realizada com sucesso!"); // Mensagem de sucesso
                 } catch (Exception ex) {
                     // Mensagem de erro em caso de exceção
@@ -87,25 +106,26 @@ public class MatriculaPanel {
                 }
             }
         });
-
+    
         // Adicionar os componentes ao painel
         panel.add(alunoLabel); // Adiciona o rótulo do aluno
         panel.add(alunoComboBox); // Adiciona o ComboBox do aluno
-
+    
         panel.add(turmaLabel); // Adiciona o rótulo da turma
         panel.add(turmaComboBox); // Adiciona o ComboBox da turma
-
+    
         panel.add(dataMatriculaLabel); // Adiciona o rótulo da data de matrícula
         panel.add(dataMatriculaField); // Adiciona o campo de data de matrícula
-
+    
         panel.add(statusLabel); // Adiciona o rótulo do status
         panel.add(statusComboBox); // Adiciona o ComboBox do status
-
+    
         panel.add(new JLabel()); // Espaçamento
         panel.add(matricularButton); // Adiciona o botão de realizar matrícula
-
+    
         return panel; // Retorna o painel criado
     }
+    
 
     // Método para carregar as turmas no JComboBox
     private void loadTurmas(JComboBox<String> turmaComboBox) {

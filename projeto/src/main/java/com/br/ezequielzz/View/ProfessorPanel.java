@@ -11,6 +11,7 @@ import java.awt.*;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -89,6 +90,38 @@ public class ProfessorPanel {
                 String telefone = telefoneField.getText().trim(); // Telefone do professor
                 String senha = senhaField.getText().trim(); // Senha do professor
 
+                // Verificação de Data de Nascimento
+                String dataNascimentoStr = dataNascimentoField.getText().trim();
+                String[] dataSplit = dataNascimentoStr.split("/"); // Separando o dia, mês e ano
+
+                // Se for obtido 3 '/' então separe
+                if (dataSplit.length == 3) {
+                    int dia = Integer.parseInt(dataSplit[0]); // Obtendo a primeira separação
+                    int mes = Integer.parseInt(dataSplit[1]); // Obtendo a segunda separação
+                    int ano = Integer.parseInt(dataSplit[2]); // Obtendo a terceira separação
+
+                    // Verificando se o dia, mês e ano são válidos
+                    if (dia < 1 || dia > 31) {
+                        JOptionPane.showMessageDialog(null, "Dia inválido!");
+                        return; // Sai do método se não houver o dia válido
+                    }
+
+                    if (mes < 1 || mes > 12) {
+                        JOptionPane.showMessageDialog(null, "Mês inválido!");
+                        return; // Sai do método se não houver o mês válido
+                    }
+
+                    // Buscando o ano do sistema
+                    int anoAtual = Calendar.getInstance().get(Calendar.YEAR);
+                    if (ano < 1985 || ano > anoAtual) {
+                        JOptionPane.showMessageDialog(null, "Ano inválido!");
+                        return; // Sai do método se não houver o ano válido
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "Data de nascimento inválida!");
+                    return; // Sai do método se não obtiver o formato correto
+                }
+
                 // Convertendo a data de nascimento
                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy"); // Formato da data
                 Date dataNascimento = formatter.parse(dataNascimentoField.getText().trim()); // Data de nascimento do professor
@@ -108,6 +141,12 @@ public class ProfessorPanel {
                 // Captura e exibe erros durante a criação do professor
                 JOptionPane.showMessageDialog(null, "Erro ao criar professor: " + ex.getMessage());
             }
+        });
+
+        JButton voltarBtn = new JButton("Voltar");
+        voltarBtn.addActionListener(e -> {
+            panel.setVisible(false); // Esconder o formulário de criação
+            tabelaProfessores.setVisible(true); // Mostrar a tabela de alunos novamente
         });
 
         // Adicionar os campos ao painel
@@ -131,74 +170,113 @@ public class ProfessorPanel {
 
         panel.add(new JLabel()); // Espaçamento
         panel.add(criarProfessorButton); // Adiciona botão de criação
+        panel.add(voltarBtn); // Adiciona botão de voltar
 
         return panel; // Retorna o painel criado
     }
 
-    // Método para criar o painel de listagem de professores
     public JPanel criarListarProfessoresPanel() {
-        JPanel panel = new JPanel(); // Cria um painel para listar professores
-        panel.setLayout(new BorderLayout()); // Define o layout do painel como BorderLayout
-
+        JPanel panel = new JPanel(new GridBagLayout()); // Usa GridBagLayout para flexibilidade
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+    
         // Definir os nomes das colunas
         String[] colunas = { "ID", "Nome", "CPF", "Data de Nascimento", "Endereço", "Telefone" }; // Colunas da tabela
-
+    
         // Criar um DefaultTableModel inicialmente com dados vazios
-        DefaultTableModel modeloTabela = new DefaultTableModel(new Object[0][6], colunas); // Modelo da tabela
-        tabelaProfessores = new JTable(modeloTabela); // Agora usando DefaultTableModel para a tabela
-        JScrollPane scrollPane = new JScrollPane(tabelaProfessores); // Cria um JScrollPane para a tabela
-        panel.add(scrollPane, BorderLayout.CENTER); // Adiciona a tabela ao painel
-
+        DefaultTableModel modeloTabela = new DefaultTableModel(new Object[0][6], colunas);
+        tabelaProfessores = new JTable(modeloTabela); // Inicializa a tabela com o modelo
+    
+        JScrollPane scrollPane = new JScrollPane(tabelaProfessores); // Cria uma barra de rolagem para a tabela
+    
         // Inicializar a tabela com os dados
-        atualizarTabelaProfessores(); // Atualiza a tabela com os dados atuais
-
+        atualizarTabelaProfessores(); // Atualiza a tabela com os dados dos professores
+    
         // Criar painel para os botões
-        JPanel botaoPanel = new JPanel(); // Painel para os botões de ação
-
+        JPanel botaoPanel = new JPanel();
+        JButton btnCriarNovoProfessor = new JButton("Criar Novo Professor");
+        JPanel criarProfessorPanel = criarProfessorPanel(); // Reutiliza o método para o formulário de criação
+        criarProfessorPanel.setVisible(false); // Esconder o formulário inicialmente
+    
+        btnCriarNovoProfessor.addActionListener(e -> {
+            tabelaProfessores.setVisible(false); // Esconder a tabela de professores
+            criarProfessorPanel.setVisible(true); // Mostrar o painel de criação de professor
+        });
+    
+        // Adicionar o botão ao painel de botões na parte superior
+        botaoPanel.add(btnCriarNovoProfessor);
+    
         // Botão de Excluir
-        JButton btnExcluir = new JButton("Excluir"); // Botão para excluir professor
+        JButton btnExcluir = new JButton("Excluir"); // Botão para excluir um professor
         btnExcluir.addActionListener(e -> {
-            int linhaSelecionada = tabelaProfessores.getSelectedRow(); // Obtém a linha selecionada na tabela
-            if (linhaSelecionada != -1) { // Verifica se há uma linha selecionada
+            int linhaSelecionada = tabelaProfessores.getSelectedRow(); // Obtém a linha selecionada
+            if (linhaSelecionada != -1) { // Verifica se uma linha está selecionada
                 int professorId = (int) tabelaProfessores.getValueAt(linhaSelecionada, 0); // ID do professor
                 try {
                     professorController.excluirProfessor(professorId); // Chama o método para excluir o professor
                     JOptionPane.showMessageDialog(panel, "Professor excluído com sucesso!"); // Mensagem de sucesso
                     atualizarTabelaProfessores(); // Atualizar a tabela após exclusão
                 } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(panel, "Erro ao excluir professor: " + ex.getMessage()); // Mensagem de erro
+                    // Mensagem de erro se ocorrer um problema ao excluir
+                    JOptionPane.showMessageDialog(panel, "Erro ao excluir professor: " + ex.getMessage());
                 }
             } else {
-                JOptionPane.showMessageDialog(panel, "Selecione um professor para excluir."); // Mensagem para selecionar um professor
+                // Mensagem para informar que deve-se selecionar um professor
+                JOptionPane.showMessageDialog(panel, "Selecione um professor para excluir.");
             }
         });
-
+    
         // Botão de Atualizar
-        JButton btnAtualizar = new JButton("Atualizar"); // Botão para atualizar professor
+        JButton btnAtualizar = new JButton("Atualizar"); // Botão para atualizar um professor
         btnAtualizar.addActionListener(e -> {
-            int linhaSelecionada = tabelaProfessores.getSelectedRow(); // Obtém a linha selecionada na tabela
-            if (linhaSelecionada != -1) { // Verifica se há uma linha selecionada
-                int professorId = (int) tabelaProfessores.getValueAt(linhaSelecionada, 0); // ID do professor
+            int linhaSelecionada = tabelaProfessores.getSelectedRow(); // Obtém a linha selecionada
+            if (linhaSelecionada != -1) { // Verifica se uma linha está selecionada
+                // Obter o ID do professor selecionado
+                int professorId = (int) tabelaProfessores.getValueAt(linhaSelecionada, 0);
                 try {
-                    Professor professor = professorController.buscarProfessorPorId(professorId); // Busca o professor pelo ID
-                    if (professor != null) {
-                        editarProfessorDialog(professor); // Abre o diálogo de edição
+                    // Buscar os dados completos do professor
+                    Professor professor = professorController.buscarProfessorPorId(professorId);
+                    // Abrir um diálogo para edição
+                    if (professor != null) { // Verifica se o professor foi encontrado
+                        editarProfessorDialog(professor); // Chama o método para editar o professor
                     } else {
-                        JOptionPane.showMessageDialog(panel, "Professor não encontrado."); // Mensagem se não encontrado
+                        // Mensagem caso o professor não seja encontrado
+                        JOptionPane.showMessageDialog(panel, "Professor não encontrado.");
                     }
                 } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(panel, "Erro ao buscar professor: " + ex.getMessage()); // Mensagem de erro
+                    // Mensagem de erro se ocorrer um problema ao buscar o professor
+                    JOptionPane.showMessageDialog(panel, "Erro ao buscar professor: " + ex.getMessage());
                 }
             } else {
-                JOptionPane.showMessageDialog(panel, "Selecione um professor para atualizar."); // Mensagem para selecionar um professor
+                // Mensagem para informar que deve-se selecionar um professor
+                JOptionPane.showMessageDialog(panel, "Selecione um professor para atualizar.");
             }
         });
-
-        botaoPanel.add(btnAtualizar); // Adiciona o botão de atualizar ao painel de botões
-        botaoPanel.add(btnExcluir); // Adiciona o botão de excluir ao painel de botões
-        panel.add(botaoPanel, BorderLayout.NORTH); // Adiciona o painel de botões ao painel principal
-
-        return panel; // Retorna o painel criado
+    
+        botaoPanel.add(btnAtualizar);
+        botaoPanel.add(btnExcluir);
+    
+        // Layout para os botões no topo
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weighty = 0.05; // Menor peso para os botões
+        panel.add(botaoPanel, gbc);
+    
+        // Layout para a tabela
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weighty = 0.25; // Tamanho maior para a tabela
+        panel.add(scrollPane, gbc);
+    
+        // Layout para o formulário de criação de professor
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.weighty = 0.45; // Espaço menor para o formulário
+        panel.add(criarProfessorPanel, gbc);
+    
+        return panel;
     }
 
     // Método para atualizar a tabela de professores

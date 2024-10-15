@@ -16,7 +16,7 @@ public class MatriculaController {
     }
 
     // Cancelar a matrícula de um aluno
-    public void cancelarMatricula(Matricula matricula) {
-        matriculaDAO.cancelarMatricula(matricula);
+    public void cancelarMatricula(int alunoId) {
+        matriculaDAO.cancelarMatricula(alunoId);
     }
 }

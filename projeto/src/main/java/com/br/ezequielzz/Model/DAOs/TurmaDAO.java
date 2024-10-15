@@ -141,6 +141,34 @@ public class TurmaDAO {
         return null;
     }
 
+    public Turma buscarTurmaPorAluno(int alunoId) throws SQLException {
+        String sql = "SELECT t.* FROM Turma t "
+        + "JOIN Aluno a ON t.id = a.turma_id "
+        + "WHERE a.id = ?";
+        
+        try (Connection connection = ConnectionFactory.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, alunoId);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return new Turma(
+                        rs.getInt("id"),
+                        rs.getString("serie"),
+                        rs.getString("ano_letivo"),
+                        rs.getString("turno"),
+                        rs.getString("sala")
+                );
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException("Erro ao buscar turma para o aluno", e);
+        }
+        return null;
+    }
+    
+
     public void excluirTurma(int turmaId) throws SQLException {
         String sql = "DELETE FROM Turma WHERE id = ?";
 

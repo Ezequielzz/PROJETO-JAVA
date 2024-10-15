@@ -40,6 +40,18 @@ public class TurmaController {
         return turmaDAO.buscarPorDisciplina(disciplinaId);
     }
 
+    // Método para buscar a turma por ID do aluno
+    public Turma buscarTurmaPorAluno(int alunoId) {
+        try {
+            return turmaDAO.buscarTurmaPorAluno(alunoId); // Chama o método no DAO
+        } catch (SQLException e) {
+            // Aqui você pode tratar a exceção ou relatar um erro
+            e.printStackTrace();
+            return null; // Retorna null em caso de erro
+        }
+    }
+
+
     public void excluirTurma(int turmaId) throws SQLException {
         turmaDAO.excluirTurma(turmaId);
     }

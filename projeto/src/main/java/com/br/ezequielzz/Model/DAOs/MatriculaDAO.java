@@ -28,14 +28,14 @@ public class MatriculaDAO {
         }
     }
 
-    public void cancelarMatricula(Matricula matricula) {
-        String sql = "UPDATE Matricula SET status = ? WHERE id = ?";
+    public void cancelarMatricula(int alunoId) {
+        String sql = "UPDATE Matricula SET status = ? WHERE aluno_id = ?";
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, matricula.getStatus());
-            stmt.setInt(2, matricula.getId());
+            stmt.setString(1, "cancelado");
+            stmt.setInt(2, alunoId);
             int rowsUpdated = stmt.executeUpdate();
 
             if (rowsUpdated > 0) {

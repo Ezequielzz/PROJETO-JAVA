@@ -11,7 +11,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class Aluno extends Pessoa {
     private int turmaId;
-    private String statusMatricula;
+    private String statusMatricula; // 'ativo', 'desligado', 'transferido'
 
     public Aluno(int id, String nome, String cpf, Date dataNascimento, String endereco, String telefone, String senha, int turmaId, String statusMatricula) {
         super(id, nome, cpf, dataNascimento, endereco, telefone, senha); // Parâmetros de Pessoa

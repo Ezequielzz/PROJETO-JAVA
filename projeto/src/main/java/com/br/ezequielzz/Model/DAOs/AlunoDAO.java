@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.sql.Date;
 import java.util.List;
 
 public class AlunoDAO {
@@ -119,7 +120,7 @@ public class AlunoDAO {
 
             stmt.setString(1, aluno.getNome());
             stmt.setString(2, aluno.getCpf());
-            stmt.setDate(3, new java.sql.Date(aluno.getDataNascimento().getTime()));
+            stmt.setDate(3, new Date(aluno.getDataNascimento().getTime()));
             stmt.setString(4, aluno.getEndereco());
             stmt.setString(5, aluno.getTelefone());
             stmt.setString(6, aluno.getSenha());

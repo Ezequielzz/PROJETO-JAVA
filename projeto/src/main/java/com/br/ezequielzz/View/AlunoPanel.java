@@ -3,6 +3,7 @@ package com.br.ezequielzz.View;
 import java.awt.*;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -36,91 +37,6 @@ public class AlunoPanel {
     public AlunoPanel(AlunoController alunoController, TurmaController turmaController) {
         this.alunoController = alunoController;
         this.turmaController = turmaController;
-    }
-
-    // Método para criar o painel que lista os alunos
-    public JPanel criarListarAlunosPanel() {
-        JPanel panel = new JPanel(); // Painel principal
-        panel.setLayout(new BorderLayout()); // Define o layout do painel
-
-        // Definir os nomes das colunas
-        String[] colunas = { "ID", "Nome", "CPF", "Data de Nascimento", "Endereço", "Telefone", "Turma",
-                "Situação Matrícula" };
-
-        // Criar um DefaultTableModel inicialmente com dados vazios
-        DefaultTableModel modeloTabela = new DefaultTableModel(new Object[0][8], colunas); // Modelo da tabela
-        tabelaAlunos = new JTable(modeloTabela); // Inicializa a tabela com o modelo
-        JScrollPane scrollPane = new JScrollPane(tabelaAlunos); // Cria uma barra de rolagem para a tabela
-        panel.add(scrollPane, BorderLayout.CENTER); // Adiciona a barra de rolagem ao painel
-
-        // Inicializar a tabela com os dados
-        atualizarTabelaAlunos(); // Atualiza a tabela com os dados dos alunos
-
-        // Criar painel para os botões
-        JPanel botaoPanel = new JPanel(); // Painel para os botões
-
-        // Adicionar o botão de "Criar Novo Aluno" no painel de listagem
-        JButton btnCriarNovoAluno = new JButton("Criar Novo Aluno");
-        btnCriarNovoAluno.addActionListener(e -> {
-            JPanel criarAlunoPanel = criarAlunoPanel(); // Chama o método que retorna o formulário de criação
-            JOptionPane.showMessageDialog(null, criarAlunoPanel, "Criar Novo Aluno", JOptionPane.PLAIN_MESSAGE);
-        });
-
-        // Adicionar o botão ao painel de botões na parte superior
-        botaoPanel.add(btnCriarNovoAluno);
-
-        // Botão de Excluir
-        JButton btnExcluir = new JButton("Excluir"); // Botão para excluir um aluno
-        btnExcluir.addActionListener(e -> {
-            int linhaSelecionada = tabelaAlunos.getSelectedRow(); // Obtém a linha selecionada
-            if (linhaSelecionada != -1) { // Verifica se uma linha está selecionada
-                int alunoId = (int) tabelaAlunos.getValueAt(linhaSelecionada, 0); // ID do aluno
-                try {
-                    alunoController.excluirAluno(alunoId); // Chama o método para excluir o aluno
-                    JOptionPane.showMessageDialog(panel, "Aluno excluído com sucesso!"); // Mensagem de sucesso
-                    atualizarTabelaAlunos(); // Atualizar a tabela após exclusão
-                } catch (SQLException ex) {
-                    // Mensagem de erro se ocorrer um problema ao excluir
-                    JOptionPane.showMessageDialog(panel, "Erro ao excluir aluno: " + ex.getMessage());
-                }
-            } else {
-                // Mensagem para informar que deve-se selecionar um aluno
-                JOptionPane.showMessageDialog(panel, "Selecione um aluno para excluir.");
-            }
-        });
-
-        // Botão de Atualizar
-        JButton btnAtualizar = new JButton("Atualizar"); // Botão para atualizar um aluno
-        btnAtualizar.addActionListener(e -> {
-            int linhaSelecionada = tabelaAlunos.getSelectedRow(); // Obtém a linha selecionada
-            if (linhaSelecionada != -1) { // Verifica se uma linha está selecionada
-                // Obter o ID do aluno selecionado
-                int alunoId = (int) tabelaAlunos.getValueAt(linhaSelecionada, 0);
-                try {
-                    // Buscar os dados completos do aluno
-                    Aluno aluno = alunoController.buscarAlunoPorId(alunoId);
-                    // Abrir um diálogo para edição
-                    if (aluno != null) { // Verifica se o aluno foi encontrado
-                        editarAlunoDialog(aluno); // Chama o método para editar o aluno
-                    } else {
-                        // Mensagem caso o aluno não seja encontrado
-                        JOptionPane.showMessageDialog(panel, "Aluno não encontrado.");
-                    }
-                } catch (SQLException ex) {
-                    // Mensagem de erro se ocorrer um problema ao buscar o aluno
-                    JOptionPane.showMessageDialog(panel, "Erro ao buscar aluno: " + ex.getMessage());
-                }
-            } else {
-                // Mensagem para informar que deve-se selecionar um aluno
-                JOptionPane.showMessageDialog(panel, "Selecione um aluno para atualizar.");
-            }
-        });
-
-        botaoPanel.add(btnAtualizar); // Adiciona o botão de atualizar ao painel de botões
-        botaoPanel.add(btnExcluir); // Adiciona o botão de excluir ao painel de botões
-        panel.add(botaoPanel, BorderLayout.NORTH); // Adiciona o painel de botões ao painel principal
-
-        return panel; // Retorna o painel criado
     }
 
     // Método para atualizar a tabela de alunos
@@ -279,6 +195,38 @@ public class AlunoPanel {
                     return; // Sai do método se não houver turma válida
                 }
 
+                // Verificação de Data de Nascimento
+                String dataNascimentoStr = dataNascimentoField.getText().trim();
+                String[] dataSplit = dataNascimentoStr.split("/"); // Separando o dia, mês e ano
+
+                // Se for obtido 3 '/' então separe
+                if (dataSplit.length == 3) {
+                    int dia = Integer.parseInt(dataSplit[0]); // Obtendo a primeira separação
+                    int mes = Integer.parseInt(dataSplit[1]); // Obtendo a segunda separação
+                    int ano = Integer.parseInt(dataSplit[2]); // Obtendo a terceira separação
+
+                    // Verificando se o dia, mês e ano são válidos
+                    if (dia < 1 || dia > 31) {
+                        JOptionPane.showMessageDialog(null, "Dia inválido!");
+                        return; // Sai do método se não houver o dia válido
+                    }
+
+                    if (mes < 1 || mes > 12) {
+                        JOptionPane.showMessageDialog(null, "Mês inválido!");
+                        return; // Sai do método se não houver o mês válido
+                    }
+
+                    // Buscando o ano do sistema
+                    int anoAtual = Calendar.getInstance().get(Calendar.YEAR);
+                    if (ano < 1985 || ano > anoAtual) {
+                        JOptionPane.showMessageDialog(null, "Ano inválido!");
+                        return; // Sai do método se não houver o ano válido
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "Data de nascimento inválida!");
+                    return; // Sai do método se não obtiver o formato correto
+                }
+
                 // Convertendo a data de nascimento
                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy"); // Formato da data
                 Date dataNascimento = formatter.parse(dataNascimentoField.getText().trim()); // Converte a string para
@@ -304,6 +252,12 @@ public class AlunoPanel {
                 // Mensagem de erro em caso de exceção
                 JOptionPane.showMessageDialog(null, "Erro ao criar aluno: " + ex.getMessage());
             }
+        });
+
+        JButton voltarBtn = new JButton("Voltar");
+        voltarBtn.addActionListener(e -> {
+            panel.setVisible(false); // Esconder o formulário de criação
+            tabelaAlunos.setVisible(true); // Mostrar a tabela de alunos novamente
         });
 
         // Adicionar os campos ao painel
@@ -333,8 +287,159 @@ public class AlunoPanel {
 
         panel.add(new JLabel()); // Espaçamento
         panel.add(criarAlunoButton); // Adiciona o botão de criar aluno
+        panel.add(voltarBtn); // Adiciona o botão para voltar
 
         return panel; // Retorna o painel criado
+    }
+
+    public JPanel criarListarAlunosPanel() {
+        JPanel panel = new JPanel(new GridBagLayout()); // Usa GridBagLayout para um layout flexível
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+
+        // Definir os nomes das colunas
+        String[] colunas = { "ID", "Nome", "CPF", "Data de Nascimento", "Endereço", "Telefone", "Turma",
+                "Situação Matrícula" };
+
+        // Criar um DefaultTableModel inicialmente com dados vazios
+        DefaultTableModel modeloTabela = new DefaultTableModel(new Object[0][8], colunas);
+        tabelaAlunos = new JTable(modeloTabela); // Inicializa a tabela com o modelo
+
+        JScrollPane scrollPane = new JScrollPane(tabelaAlunos); // Cria uma barra de rolagem para a tabela
+
+        // Inicializar a tabela com os dados
+        atualizarTabelaAlunos(); // Atualiza a tabela com os dados dos alunos
+
+        // Criar painel para os botões
+        JPanel botaoPanel = new JPanel();
+        JButton btnCriarNovoAluno = new JButton("Criar Novo Aluno");
+        JPanel criarAlunoPanel = criarAlunoPanel(); // Reutiliza o método para o formulário de criação
+        criarAlunoPanel.setVisible(false); // Esconder o formulário inicialmente
+
+        btnCriarNovoAluno.addActionListener(e -> {
+            tabelaAlunos.setVisible(false); // Esconder a tabela de alunos
+            criarAlunoPanel.setVisible(true); // Mostrar o painel de criação de aluno
+        });
+
+        // Adicionar o botão ao painel de botões na parte superior
+        botaoPanel.add(btnCriarNovoAluno);
+
+        // Botão de Excluir
+        JButton btnExcluir = new JButton("Excluir");
+        btnExcluir.addActionListener(e -> {
+            int linhaSelecionada = tabelaAlunos.getSelectedRow();
+            if (linhaSelecionada != -1) {
+                int alunoId = (int) tabelaAlunos.getValueAt(linhaSelecionada, 0);
+                try {
+                    alunoController.excluirAluno(alunoId);
+                    JOptionPane.showMessageDialog(panel, "Aluno excluído com sucesso!");
+                    atualizarTabelaAlunos();
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(panel, "Erro ao excluir aluno: " + ex.getMessage());
+                }
+            } else {
+                JOptionPane.showMessageDialog(panel, "Selecione um aluno para excluir.");
+            }
+        });
+
+        // Botão de Atualizar
+        JButton btnAtualizar = new JButton("Atualizar");
+        btnAtualizar.addActionListener(e -> {
+            int linhaSelecionada = tabelaAlunos.getSelectedRow();
+            if (linhaSelecionada != -1) {
+                int alunoId = (int) tabelaAlunos.getValueAt(linhaSelecionada, 0);
+                try {
+                    Aluno aluno = alunoController.buscarAlunoPorId(alunoId);
+                    if (aluno != null) {
+                        editarAlunoDialog(aluno);
+                    } else {
+                        JOptionPane.showMessageDialog(panel, "Aluno não encontrado.");
+                    }
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(panel, "Erro ao buscar aluno: " + ex.getMessage());
+                }
+            } else {
+                JOptionPane.showMessageDialog(panel, "Selecione um aluno para atualizar.");
+            }
+        });
+
+        // Botão de Desligar
+        JButton btnDesligar = new JButton("Desligar Aluno");
+        btnDesligar.addActionListener(e -> {
+            int linhaSelecionada = tabelaAlunos.getSelectedRow(); // Verifica se uma linha foi selecionada
+            if (linhaSelecionada != -1) {
+                int alunoId = (int) tabelaAlunos.getValueAt(linhaSelecionada, 0); // Obtém o ID do aluno
+                try {
+                    alunoController.desligarAluno(alunoId); // Desliga o aluno
+                    JOptionPane.showMessageDialog(panel, "Aluno desligado com sucesso!"); // Sucesso
+                    atualizarTabelaAlunos(); // Atualizar a tabela
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(panel, "Erro ao desligar aluno: " + ex.getMessage());
+                }
+            } else {
+                JOptionPane.showMessageDialog(panel, "Selecione um aluno para desligar.");
+            }
+        });
+
+        // Botão de Transferir
+        JButton btnTransferir = new JButton("Transferir de Sala");
+        btnTransferir.addActionListener(e -> {
+            int linhaSelecionada = tabelaAlunos.getSelectedRow();
+            if (linhaSelecionada != -1) {
+                int alunoId = (int) tabelaAlunos.getValueAt(linhaSelecionada, 0);
+
+                // Criação do JComboBox para turmas
+                JComboBox<String> turmaComboBox = new JComboBox<>();
+                loadTurmas(turmaComboBox); // Carregar as turmas
+
+                // Exibe o JComboBox em um JOptionPane
+                int resultado = JOptionPane.showConfirmDialog(panel, turmaComboBox, "Selecione a nova turma",
+                        JOptionPane.OK_CANCEL_OPTION);
+                if (resultado == JOptionPane.OK_OPTION) {
+                    String turmaSelecionada = (String) turmaComboBox.getSelectedItem();
+                    int novaTurmaId = Integer.parseInt(turmaSelecionada.split(" - ")[0]); // Extrai o ID da turma
+                                                                                          // selecionada
+
+                    try {
+                        alunoController.transferirAluno(alunoId, novaTurmaId); // Transferir o aluno
+                        JOptionPane.showMessageDialog(panel, "Aluno transferido com sucesso!"); // Sucesso
+                        atualizarTabelaAlunos(); // Atualizar a tabela
+                    } catch (SQLException ex) {
+                        JOptionPane.showMessageDialog(panel, "Erro ao transferir aluno: " + ex.getMessage());
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(panel, "Selecione um aluno para transferir.");
+            }
+        });
+
+        // Adicionar os botões ao painel
+        botaoPanel.add(btnAtualizar);
+        botaoPanel.add(btnExcluir);
+        botaoPanel.add(btnDesligar); // Adicionar botão "Desligar"
+        botaoPanel.add(btnTransferir); // Adicionar botão "Transferir"
+
+        // Layout para os botões no topo
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weighty = 0.05; // Menor peso para os botões
+        panel.add(botaoPanel, gbc);
+
+        // Layout para a tabela
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weighty = 0.35; // Tamanho maior para a tabela
+        panel.add(scrollPane, gbc);
+
+        // Layout para o formulário de criação de aluno
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.weighty = 0.45; // Espaço menor para o formulário
+        panel.add(criarAlunoPanel, gbc);
+
+        return panel;
     }
 
     private void loadTurmas(JComboBox<String> turmaComboBox) {
